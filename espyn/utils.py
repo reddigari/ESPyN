@@ -30,3 +30,8 @@ def get_week_from_date(date):
     weeks_since = days_since / 7.
     week = math.floor(weeks_since) + 1
     return int(week)
+
+
+def current_week():
+    now = datetime.now()
+    return get_week_from_date(now)
