@@ -8,7 +8,7 @@ SLOTS = {
     16: "D/ST",
     17: "K",
     20: "BENCH",
-    23: "FLEX",
+    23: "FLEX"
 }
 
 POSITIONS = {
@@ -17,7 +17,7 @@ POSITIONS = {
     3: "WR",
     4: "TE",
     5: "K",
-    16: "D/ST",
+    16: "D/ST"
 }
 
 PRO_TEAMS = {
@@ -54,4 +54,48 @@ PRO_TEAMS = {
     30: "JAX",
     33: "BAL",
     34: "HOU"
+}
+
+# missing codes for punt, ko, and block TD returns,
+# and probably more
+STAT_CODES = {
+    0: "pass_att",
+    1: "pass_cmp",
+    3: "pass_yds",
+    4: "pass_td",
+    5: "every_5_pass_yds",
+    19: "2pt_pass_or_rec",
+    20: "int",
+    23: "rush_att",
+    24: "rush_yds",
+    25: "rush_td",
+    26: "2pt_rush",
+    29: "rush_yds_per_att",
+    41: "rec",
+    42: "rec_yds",
+    43: "rec_td",
+    58: "tgt",
+    60: "rec_yds_per_rec",
+    72: "fum_lost",
+    90: "1-6_pts_allowed",
+    91: "7-13_pts_allowed",
+    92: "14-17_pts_allowed",
+    95: "def_int",
+    96: "fum_recov",
+    97: "block",
+    98: "safety",
+    99: "sack",
+    103: "td_int_return",
+    104: "td_fum_return",
+    123: "28-34_pts_allowed",
+    124: "35-45_pts_allowed",
+    125: "46+_pts_allowed",
+    128: "0-99_yds_allowed",
+    129: "100-199_yds_allowed",
+    130: "200-299_yds_allowed",
+    132: "350-399_yds_allowed",
+    133: "400-449_yds_allowed",
+    134: "450-499_yds_allowed",
+    135: "500-549_yds_allowed",
+    136: "550+_yds_allowed"
 }

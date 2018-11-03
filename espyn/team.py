@@ -6,7 +6,10 @@ class Team:
         self.team_abbrev = team_data["teamAbbrev"]
         self.team_location = team_data["teamLocation"]
         self.team_nickname = team_data["teamNickname"]
-        self.owner = team_data["owners"][0]["firstName"]
+        try:
+            self.owner = team_data["owners"][0]["firstName"]
+        except KeyError:
+            self.owner = "Team {} Owner".format(self.team_id)
         self.division_id = team_data["division"]["divisionId"]
         record = team_data["record"]
         self.points_for = record["pointsFor"]
@@ -15,6 +18,7 @@ class Team:
         self.losses = record["overallLosses"]
         self.ties = record["overallTies"]
         self.winning_pct = record["overallPercentage"]
+        self.acquisitions = team_data["teamTransactions"]["overallAcquisitionTotal"]
 
     def __repr__(self):
         return "Team {} : {} : {} : {}".format(

@@ -1,5 +1,5 @@
 from .player import Player
-from .constants import SLOTS
+from .constants import SLOTS, STAT_CODES
 
 
 class PlayerWeek:
@@ -12,7 +12,24 @@ class PlayerWeek:
         proj = stat_data["currentPeriodProjectedStats"]
         self.points = real.get("appliedStatTotal")
         self.projected_points = proj.get("appliedStatTotal")
-        # self._coded_stats = {int(k): v for k, v in real["rawStats"].items()}
+        self._coded_stats = {}
+        if real.get("rawStats"):
+            self._coded_stats = {int(k): v for k, v in real["rawStats"].items()}
+
+    def __repr__(self):
+        pts_str = "Inactive" if self.points is None else "%0.1f points" % self.points
+        return "{} : {} : {}".format(
+            self.slot, self.player, pts_str
+        )
+
+    @property
+    def stat_line(self):
+        stats =  {}
+        for code, val in self._coded_stats.items():
+            stat = STAT_CODES.get(code)
+            if stat:
+                stats[stat] = val
+        return stats
 
     @property
     def projection_error(self):
@@ -25,14 +42,8 @@ class PlayerWeek:
         :return: player's fantasy points according to mapping
         """
         total = 0
-        for code, val in self._coded_stats:
+        for code, val in self._coded_stats.items():
             if code in score_values:
                 total += score_values[code] * val
-        return total
-
-    def __repr__(self):
-        pts_str = "Inactive" if self.points is None else "%0.1f points" % self.points
-        return "{} : {} : {}".format(
-            self.slot, self.player, pts_str
-        )
+        return round(total, 2)
 

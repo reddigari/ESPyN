@@ -12,7 +12,7 @@ class League:
 
     def __init__(self, league_id, season=None, cache_dir=None):
         self._req = requests
-        self.cache = False
+        self._cache = False
         self._endpoint = ENDPOINT
         self.league_id = league_id
         if season is None:
@@ -59,7 +59,6 @@ class League:
         if self._cache:
             data = self._load_cached_matchup(week, team_id)
             if data:
-                print("data from cache")
                 return data["boxscore"]
         url = self._endpoint + "boxscore"
         params = self._url_params()
