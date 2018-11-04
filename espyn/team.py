@@ -1,3 +1,6 @@
+from .matchup import Matchup
+
+
 class Team:
 
     def __init__(self, team_data, league):
@@ -19,11 +22,15 @@ class Team:
         self.ties = record["overallTies"]
         self.winning_pct = record["overallPercentage"]
         self.acquisitions = team_data["teamTransactions"]["overallAcquisitionTotal"]
+        self.matchups = []
 
     def __repr__(self):
         return "Team {} : {} : {} : {}".format(
             self.team_id, self.owner, self.full_name, self.record
         )
+
+    def set_matchups(self, matchups):
+        self.matchups = matchups
 
     @property
     def full_name(self):
@@ -34,4 +41,11 @@ class Team:
         return "{}-{}-{}".format(self.wins, self.losses, self.ties)
 
     def get_matchup_by_week(self, week):
-        return self._league.get_matchup(week, self.team_id)
+        return self.matchups[week - 1]
+
+    def get_data_by_week(self, week):
+        m = self.get_matchup_by_week(week)
+        if m.home_team_id == self.team_id:
+            return m.home_data
+        else:
+            return m.away_data

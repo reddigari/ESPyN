@@ -13,8 +13,11 @@ class PlayerWeek:
         self.points = real.get("appliedStatTotal")
         self.projected_points = proj.get("appliedStatTotal")
         self._coded_stats = {}
+        self._coded_proj = {}
         if real.get("rawStats"):
             self._coded_stats = {int(k): v for k, v in real["rawStats"].items()}
+        if proj.get("rawStats"):
+            self._coded_proj = {int(k): v for k, v in proj["rawStats"].items()}
 
     def __repr__(self):
         pts_str = "Inactive" if self.points is None else "%0.1f points" % self.points
