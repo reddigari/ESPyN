@@ -24,7 +24,10 @@ def _labor_day(year):
 
 
 def get_week_from_date(date):
-    ld = _labor_day(date.year)
+    month, year = date.month, date.year
+    if month < 4:
+        year -= 1
+    ld = _labor_day(year)
     wk1_wed = ld + timedelta(days=2)
     days_since = (date - wk1_wed).days
     weeks_since = days_since / 7.

@@ -12,16 +12,18 @@ class Matchup:
         self.home_score = matchup["homeTeamScores"][0]
         self.away_score = matchup["awayTeamScores"][0]
         self._outcome_code = matchup["outcome"]
-        self.home_team = league.get_team(self.home_team_id)
-        self.away_team = league.get_team(self.away_team_id)
+        self.home_team = league.get_team_by_id(self.home_team_id)
+        self.away_team = league.get_team_by_id(self.away_team_id)
         self.home_data = None
         self.away_data = None
+        self._boxscore_loaded = False
         if player_data:
             self.set_player_data(player_data)
 
     def set_player_data(self, player_data):
         self.home_data = TeamWeek(player_data[0], self.home_team, self.week)
         self.away_data = TeamWeek(player_data[1], self.away_team, self.week)
+        self._boxscore_loaded = True
 
     # outcome verb from home team's perspective
     _outcome_verbs = {

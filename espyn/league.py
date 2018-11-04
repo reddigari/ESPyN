@@ -46,12 +46,12 @@ class League:
         """
         Sets `matchups` attr on each team.
         Must occur after teams are instantiated, because Matchup
-        relies on league's `get_team()` to identify both teams.
+        relies on league's `get_team_by_id()` to identify both teams.
 
         :param team_data: team array from leagueSettings data
         """
         for i, td in team_data.items():
-            t = self.get_team(int(i))
+            t = self.get_team_by_id(int(i))
             matchups = [Matchup(si, self) for si in td["scheduleItems"]]
             t.set_matchups(matchups)
 
@@ -101,7 +101,7 @@ class League:
         return data["boxscore"]
 
     def get_matchup(self, week, team_id, stats=False):
-        team = self.get_team(team_id)
+        team = self.get_team_by_id(team_id)
         matchup = team.get_matchup_by_week(week)
         if stats:
             data = self._get_boxscore_data(week, team_id)
