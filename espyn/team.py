@@ -1,3 +1,6 @@
+from .utils import current_week
+
+
 class Team:
 
     def __init__(self, team_data, league):
@@ -37,8 +40,30 @@ class Team:
         return self._league.get_matchup(week, self.team_id, stats)
 
     def get_data_by_week(self, week):
-        m = self.get_matchup_by_week(week)
+        # loads boxscore automatically
+        m = self.get_matchup_by_week(week, True)
         if m.home_team_id == self.team_id:
             return m.home_data
         else:
             return m.away_data
+
+    @property
+    def scores(self):
+        scores = []
+        cw = current_week()
+        for w in range(1, cw): # excludes week in progress
+            m = self.get_matchup_by_week(w)
+            if m.home_team_id == self.team_id:
+                scores.append(m.home_score)
+            else:
+                scores.append(m.away_score)
+        return scores
+
+    def current_roster(self):
+        cw = current_week()
+        m = self.get_matchup_by_week(cw, True)
+        if m.home_team_id == self.team_id:
+            data = m.home_data
+        else:
+            data = m.away_data
+        return [s.player for s in data.slots]
