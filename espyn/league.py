@@ -32,28 +32,30 @@ class League:
         self.scoring_dict = dict()
         for item in self._data["scoringItems"]:
             self.scoring_dict[item['statId']] = item['points']
-        # instantiate teams and set their matchups
+        # instantiate teams
         team_data = self._data["teams"]
         self._teams = {int(i): Team(td, self) for i, td in team_data.items()}
-        self._set_team_matchups(team_data)
+        # instantiate matchups and add indices to _matchup_dict
+        self._matchups = []
+        self._matchup_dict = {}
+        index = 0
+        for t_id, td in team_data.items():
+            for si in td["scheduleItems"]:
+                matchup = Matchup(si, self)
+                week = matchup.week
+                # add matchup and index for both teams if it doesn't exist
+                if self._lookup_matchup(week, int(t_id)) is None:
+                    self._matchups.append(matchup)
+                    week_dict = self._matchup_dict.setdefault(week, dict())
+                    for i in matchup.team_ids:
+                        week_dict[i] = index
+                    index += 1
+
 
     def __repr__(self):
         return "ESPN League {} - {} - {} teams".format(
             self.league_id, self.name, self.size
         )
-
-    def _set_team_matchups(self, team_data):
-        """
-        Sets `matchups` attr on each team.
-        Must occur after teams are instantiated, because Matchup
-        relies on league's `get_team_by_id()` to identify both teams.
-
-        :param team_data: team array from leagueSettings data
-        """
-        for i, td in team_data.items():
-            t = self.get_team_by_id(int(i))
-            matchups = [Matchup(si, self) for si in td["scheduleItems"]]
-            t.set_matchups(matchups)
 
     @property
     def teams(self):
@@ -80,31 +82,34 @@ class League:
         data = res.json()
         return data["leaguesettings"]
 
-    def _get_boxscore_data(self, week, team_id):
+    def _get_boxscore_data(self, matchup):
         if self._cache:
-            data = self._load_cached_boxscore(week, team_id)
+            data = self._load_cached_boxscore(matchup)
             if data:
                 return data["boxscore"]
         url = self._endpoint + "boxscore"
         params = self._url_params()
-        params["matchupPeriodId"] = week
-        params["teamId"] = team_id
+        params["matchupPeriodId"] = matchup.week
+        params["teamId"] = matchup.home_team_id
         print("Requesting data over the web.")
         res = self._req.get(url, params=params)
         data = res.json()
         # cache data if using cache and week is over
-        if (self._cache) & (week < current_week()):
-            # shitty way to cache the data under both team IDs
-            m_info = data["boxscore"]["scheduleItems"][0]["matchups"][0]
-            team_ids = [m_info["homeTeamId"], m_info["awayTeamId"]]
-            self._cache_boxscore(data, week, team_ids)
+        if self._cache & (matchup.week < current_week()):
+            self._cache_boxscore(data, matchup)
         return data["boxscore"]
 
+    def _lookup_matchup(self, week, team_id):
+        try:
+            matchup_idx = self._matchup_dict[week][team_id]
+            return self._matchups[matchup_idx]
+        except KeyError:
+            return None
+
     def get_matchup(self, week, team_id, stats=False):
-        team = self.get_team_by_id(team_id)
-        matchup = team.get_matchup_by_week(week)
+        matchup = self._lookup_matchup(week, team_id)
         if stats:
-            data = self._get_boxscore_data(week, team_id)
+            data = self._get_boxscore_data(matchup)
             player_data = data["teams"]
             matchup.set_player_data(player_data)
         return matchup
@@ -120,15 +125,14 @@ class League:
                 team_ids.pop(team_ids.index(team_id))
         return matchups
 
-    # def average_score(self):
-
 
     ###########################################################
     # methods for reading and writing boxscores from/to cache #
     ###########################################################
-    def _get_cache_filename(self, week, team_id):
+    def _get_cache_filename(self, matchup):
+        # name by week and home team ID
         fname = "{0}_{1:0>2}_{2:0>2}.json".format(
-            self.league_id, week, team_id
+            self.league_id, matchup.week, matchup.home_team_id
         )
         return os.path.join(self._cache_dir, fname)
 
@@ -138,13 +142,11 @@ class League:
                 return json.load(f)
         return None
 
-    def _load_cached_boxscore(self, week, team_id):
-        fname = self._get_cache_filename(week, team_id)
+    def _load_cached_boxscore(self, matchup):
+        fname = self._get_cache_filename(matchup)
         return self._load_cached_file(fname)
 
-    def _cache_boxscore(self, data, week, team_ids):
-        # save twice, once under each team ID
-        for team_id in team_ids:
-            fname = self._get_cache_filename(week, team_id)
-            with open(fname, "w") as f:
-                json.dump(data, f)
+    def _cache_boxscore(self, data, matchup):
+        fname = self._get_cache_filename(matchup)
+        with open(fname, "w") as f:
+            json.dump(data, f)

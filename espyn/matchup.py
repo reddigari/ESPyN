@@ -50,3 +50,9 @@ class Matchup:
     @property
     def team_ids(self):
         return [self.home_team_id, self.away_team_id]
+
+    @property
+    def all_data(self):
+        if not self._boxscore_loaded:
+            raise RuntimeError("Boxscore not loaded for this matchup.")
+        return [self.home_data, self.away_data]

@@ -1,6 +1,3 @@
-from .matchup import Matchup
-
-
 class Team:
 
     def __init__(self, team_data, league):
@@ -22,7 +19,6 @@ class Team:
         self.ties = record["overallTies"]
         self.winning_pct = record["overallPercentage"]
         self.acquisitions = team_data["teamTransactions"]["overallAcquisitionTotal"]
-        self.matchups = []
 
     def __repr__(self):
         return "Team {} : {} : {} : {}".format(
@@ -40,8 +36,8 @@ class Team:
     def record(self):
         return "{}-{}-{}".format(self.wins, self.losses, self.ties)
 
-    def get_matchup_by_week(self, week):
-        return self.matchups[week - 1]
+    def get_matchup_by_week(self, week, stats=False):
+        return self._league.get_matchup(week, self.team_id, stats)
 
     def get_data_by_week(self, week):
         m = self.get_matchup_by_week(week)
