@@ -70,7 +70,7 @@ STAT_CODES = {
     24: "rush_yds",
     25: "rush_td",
     26: "2pt_rush",
-    29: "rush_yds_per_att",
+    39: "rush_yds_per_att",
     41: "rec",
     42: "rec_yds",
     43: "rec_td",
