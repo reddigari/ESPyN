@@ -15,7 +15,9 @@ class PlayerWeek:
         self._coded_stats = {}
         self._coded_proj = {}
         if real.get("rawStats"):
-            self._coded_stats = {int(k): v for k, v in real["rawStats"].items()}
+            self._coded_stats = {
+                int(k): v for k, v in real["rawStats"].items()
+            }
         if proj.get("rawStats"):
             self._coded_proj = {int(k): v for k, v in proj["rawStats"].items()}
 
@@ -27,7 +29,7 @@ class PlayerWeek:
 
     @property
     def stat_line(self):
-        stats =  {}
+        stats = {}
         for code, val in self._coded_stats.items():
             stat = STAT_CODES.get(code)
             if stat:
@@ -49,4 +51,3 @@ class PlayerWeek:
             if code in score_values:
                 total += score_values[code] * val
         return round(total, 2)
-

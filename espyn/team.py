@@ -25,9 +25,6 @@ class Team:
             self.team_id, self.owner, self.full_name, self.record
         )
 
-    def set_matchups(self, matchups):
-        self.matchups = matchups
-
     @property
     def full_name(self):
         return "{} {}".format(self.team_location, self.team_nickname)

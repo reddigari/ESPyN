@@ -51,7 +51,6 @@ class League:
                         week_dict[i] = index
                     index += 1
 
-
     def __repr__(self):
         return "ESPN League {} - {} - {} teams".format(
             self.league_id, self.name, self.size
@@ -125,10 +124,10 @@ class League:
                 team_ids.pop(team_ids.index(team_id))
         return matchups
 
-
     ###########################################################
     # methods for reading and writing boxscores from/to cache #
     ###########################################################
+
     def _get_cache_filename(self, matchup):
         # name by week and home team ID
         fname = "{0}_{1:0>2}_{2:0>2}.json".format(
