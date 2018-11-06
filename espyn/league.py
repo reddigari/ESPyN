@@ -1,18 +1,17 @@
 import requests
-import json
 import logging
-import os.path
 
 from .constants import ENDPOINT
 from .team import Team
 from .matchup import Matchup
 from .utils import *
+from .caches import LocalCache, CloudStorageCache
 
 
 class League:
 
-    def __init__(self, league_id, season=None, cache_dir=None,
-                 try_cache=False):
+    def __init__(self, league_id, season=None, cache=None,
+                 cache_dir=None, try_cache=False):
         self._req = requests
         self._cache = False
         self._endpoint = ENDPOINT
@@ -21,11 +20,11 @@ class League:
             self.season = current_season()
         else:
             self.season = season
-        if cache_dir:
-            if not os.path.exists(cache_dir):
-                raise ValueError("The given cache directory does not exist.")
-            self._cache = True
-            self._cache_dir = cache_dir
+        self._cache = None
+        if cache == "cloud":
+            self._cache = CloudStorageCache()
+        elif cache == "local":
+            self._cache = LocalCache(cache_dir)
         # fetch league data
         self._data = self._get_league_data(try_cache)
         self.name = self._data["name"]
@@ -176,21 +175,21 @@ class League:
         scores = self.all_scores()
         return float(sum(scores)) / len(scores)
 
-    ###########################################################
-    # methods for reading and writing boxscores from/to cache #
-    ###########################################################
+    def to_json(self):
+        res = dict()
+        res["league_id"] = self.league_id
+        res["league_name"] = self.name
+        res["league_size"] = self.size
+        res["teams"] = [t.to_json() for t in self.teams]
+        matchups = sorted(self._matchups, key=lambda i: i.week)
+        res["matchups"] = [m.to_json() for m in matchups]
+        res["all_scores"] = self.all_scores()
+        return res
 
-    def _read_from_cache(self, fname):
-        fname = os.path.join(self._cache_dir, fname)
-        if os.path.exists(fname):
-            with open(fname, "r") as f:
-                return json.load(f)
-        return None
-
-    def _write_to_cache(self, data, fname):
-        fname = os.path.join(self._cache_dir, fname)
-        with open(fname, "w") as f:
-            json.dump(data, f)
+    ############################################################
+    # methods for dealing with cache filenames and interacting #
+    # with cache objects.                                      #
+    ############################################################
 
     def _get_league_fname(self):
         return "{}_settings.json".format(self.league_id)
@@ -204,27 +203,16 @@ class League:
 
     def _load_cached_league(self):
         fname = self._get_league_fname()
-        return self._read_from_cache(fname)
+        return self._cache.read_from_cache(fname)
 
     def _load_cached_boxscore(self, matchup):
         fname = self._get_fname_from_matchup(matchup)
-        return self._read_from_cache(fname)
+        return self._cache.read_from_cache(fname)
 
     def _cache_league(self, data):
         fname = self._get_league_fname()
-        self._write_to_cache(data, fname)
+        self._cache.write_to_cache(data, fname)
 
     def _cache_boxscore(self, data, matchup):
         fname = self._get_fname_from_matchup(matchup)
-        self._write_to_cache(data, fname)
-
-    def to_json(self):
-        res = dict()
-        res["league_id"] = self.league_id
-        res["league_name"] = self.name
-        res["league_size"] = self.size
-        res["teams"] = [t.to_json() for t in self.teams]
-        matchups = sorted(self._matchups, key=lambda i: i.week)
-        res["matchups"] = [m.to_json() for m in matchups]
-        res["all_scores"] = self.all_scores()
-        return res
+        self._cache.write_to_cache(data, fname)
