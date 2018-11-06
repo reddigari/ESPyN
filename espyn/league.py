@@ -112,7 +112,7 @@ class League:
         res = self._req.get(url, params=params)
         data = res.json()
         # cache data if using cache and week is over
-        if self._cache & (matchup.week < current_week()):
+        if (self._cache is not None) & (matchup.week < current_week()):
             self._cache_boxscore(data, matchup)
         return data["boxscore"]
 
