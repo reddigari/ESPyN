@@ -56,3 +56,19 @@ class Matchup:
         if not self._boxscore_loaded:
             raise RuntimeError("Boxscore not loaded for this matchup.")
         return [self.home_data, self.away_data]
+
+    def to_json(self):
+        res = dict()
+        res["week"] = self.week
+        res["team_ids"] = self.team_ids
+        res["home_team_id"] = self.home_team_id
+        res["away_team_id"] = self.away_team_id
+        res["home_score"] = self.home_score
+        res["away_score"] = self.away_score
+        res["outcome"] = self._outcome_code
+        res["home_data"] = None
+        res["away_data"] = None
+        if self._boxscore_loaded:
+            res["home_data"] = [pw.to_json() for pw in self.home_data.slots]
+            res["away_data"] = [pw.to_json() for pw in self.away_data.slots]
+        return res

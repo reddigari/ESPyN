@@ -38,7 +38,10 @@ class PlayerWeek:
 
     @property
     def projection_error(self):
-        return self.projected_points - self.points
+        try:
+            return self.projected_points - self.points
+        except TypeError:  # sometimes one or both values is None
+            return None
 
     def calculate_points(self, score_values):
         """
@@ -51,3 +54,13 @@ class PlayerWeek:
             if code in score_values:
                 total += score_values[code] * val
         return round(total, 2)
+
+    def to_json(self):
+        res = dict()
+        res["player"] = self.player.to_json()
+        res["slot"] = self.slot
+        res["stats"] = self.stat_line
+        res["points"] = self.points
+        res["projected_points"] = self.projected_points
+        res["projection_error"] = self.projection_error
+        return res

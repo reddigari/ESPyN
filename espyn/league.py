@@ -217,3 +217,14 @@ class League:
     def _cache_boxscore(self, data, matchup):
         fname = self._get_fname_from_matchup(matchup)
         self._write_to_cache(data, fname)
+
+    def to_json(self):
+        res = dict()
+        res["league_id"] = self.league_id
+        res["league_name"] = self.name
+        res["league_size"] = self.size
+        res["teams"] = [t.to_json() for t in self.teams]
+        matchups = sorted(self._matchups, key=lambda i: i.week)
+        res["matchups"] = [m.to_json() for m in matchups]
+        res["all_scores"] = self.all_scores()
+        return res

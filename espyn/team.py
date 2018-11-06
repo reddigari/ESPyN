@@ -67,3 +67,20 @@ class Team:
         else:
             data = m.away_data
         return [s.player for s in data.slots]
+
+    def to_json(self):
+        res = dict()
+        res["team_id"] = self.team_id
+        res["team_abbrev"] = self.team_abbrev
+        res["team_location"] = self.team_location
+        res["team_nickname"] = self.team_nickname
+        res["owner"] = self.owner
+        res["division_id"] = self.division_id
+        res["points_for"] = self.points_for
+        res["points_against"] = self.points_against
+        res["wins"] = self.wins
+        res["losses"] = self.losses
+        res["ties"] = self.ties
+        res["winning_pct"] = self.winning_pct
+        res["transactions"] = self.acquisitions
+        return res

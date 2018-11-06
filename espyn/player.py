@@ -24,3 +24,14 @@ class Player:
         return "{}, {}, {}".format(
             self.full_name, self.position, self.pro_team
         )
+
+    def to_json(self):
+        res = dict()
+        res["first_name"] = self.first_name
+        res["last_name"] = self.last_name
+        res["full_name"] = self.full_name
+        res["pct_owned"] = self.pct_owned
+        res["position"] = self.position
+        res["pro_team"] = self.pro_team
+        res["player_id"] = self.player_id
+        return res
