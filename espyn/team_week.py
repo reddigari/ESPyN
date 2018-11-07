@@ -10,6 +10,8 @@ class TeamWeek:
         self.bench_points = week_data["appliedInactiveRealTotal"]
         self.slots = []
         for slot in week_data["slots"]:
+            if slot.get("player") is None:
+                continue
             self.slots.append(PlayerWeek(slot))
 
     def __repr__(self):

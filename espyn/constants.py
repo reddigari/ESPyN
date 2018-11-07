@@ -3,11 +3,14 @@ ENDPOINT = "https://games.espn.com/ffl/api/v2/"
 SLOTS = {
     0: "QB",
     2: "RB",
+    3: "RB/WR",
     4: "WR",
     6: "TE",
     16: "D/ST",
     17: "K",
+    19: "COACH",
     20: "BENCH",
+    21: "INJURED",
     23: "FLEX"
 }
 
@@ -17,6 +20,7 @@ POSITIONS = {
     3: "WR",
     4: "TE",
     5: "K",
+    14: "COACH",
     16: "D/ST"
 }
 
