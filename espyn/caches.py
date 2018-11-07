@@ -1,10 +1,9 @@
 import os
 import json
 import logging
-from google.cloud import storage
 
 
-class LocalCache():
+class LocalCache:
 
     def __init__(self, cache_dir):
         if not os.path.exists(cache_dir):
@@ -28,9 +27,11 @@ class LocalCache():
         logging.info("Wrote file {} to local cache.".format(fname))
 
 
-class CloudStorageCache():
+class CloudStorageCache:
 
     def __init__(self):
+        from google.cloud import storage
+
         gac = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         bucket_name = os.environ.get("BUCKET_NAME")
         if gac is None or bucket_name is None:

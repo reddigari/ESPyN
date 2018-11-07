@@ -1,18 +1,30 @@
-import requests
+import urllib2
 import logging
+import json
 
 from .constants import ENDPOINT
 from .team import Team
 from .matchup import Matchup
 from .utils import *
-from .caches import LocalCache, CloudStorageCache
+from .caches import LocalCache
 
 
 class League:
 
+    @staticmethod
+    def _request_json(url, params):
+        url += "?"
+        for k, v in params.items():
+            url += "{}={}&".format(k, v)
+        try:
+            res = urllib2.urlopen(url)
+            raw = res.read()
+            return json.loads(raw.decode("windows-1252"))
+        except urllib2.URLError:
+            return None
+
     def __init__(self, league_id, season=None, cache=None,
                  cache_dir=None, try_cache=False):
-        self._req = requests
         self._cache = False
         self._endpoint = ENDPOINT
         self.league_id = league_id
@@ -20,11 +32,19 @@ class League:
             self.season = current_season()
         else:
             self.season = season
-        self._cache = None
+
+        if cache is None:
+            self._cache = None
         if cache == "cloud":
+            # import if needed, storage import fails on App Engine
+            from .caches import CloudStorageCache
             self._cache = CloudStorageCache()
         elif cache == "local":
             self._cache = LocalCache(cache_dir)
+        else:
+            # pass in special cache if using in web app
+            self._cache = cache
+
         # fetch league data
         self._data = self._get_league_data(try_cache)
         self.name = self._data["name"]
@@ -90,10 +110,9 @@ class League:
         url = self._endpoint + "leagueSettings"
         params = self._url_params()
         logging.info("Requesting league settings from ESPN for %d." % self.league_id)
-        res = self._req.get(url, params=params)
-        if res.status_code != 200:
-            raise ValueError("That league ID did not return any data.")
-        data = res.json()
+        data = self._request_json(url, params)
+        if data is None:
+            raise ValueError("That league is not publicly accessible.")
         # cache if using cache
         if self._cache:
             self._cache_league(data)
@@ -109,8 +128,7 @@ class League:
         params["matchupPeriodId"] = matchup.week
         params["teamId"] = matchup.home_team_id
         logging.info("Requesting matchup data from ESPN.")
-        res = self._req.get(url, params=params)
-        data = res.json()
+        data = self._request_json(url, params)
         # cache data if using cache and week is over
         if (self._cache is not None) & (matchup.week < current_week()):
             self._cache_boxscore(data, matchup)
