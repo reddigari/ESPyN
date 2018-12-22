@@ -49,6 +49,7 @@ class League:
         self._data = self._get_league_data(try_cache)
         self.name = self._data["name"]
         self.size = self._data["size"]
+        self.draft_order = self._data["draftOrder"]
         # set stat code to points map
         self.scoring_dict = dict()
         for item in self._data["scoringItems"]:

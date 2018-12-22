@@ -22,6 +22,7 @@ class Team:
         self.ties = record["overallTies"]
         self.winning_pct = record["overallPercentage"]
         self.acquisitions = team_data["teamTransactions"]["overallAcquisitionTotal"]
+        self.draft_position = league.draft_order.index(self.team_id) + 1
 
     def __repr__(self):
         return "Team {} : {} : {} : {}".format(
@@ -53,6 +54,8 @@ class Team:
         cw = current_week()
         for w in range(1, cw): # excludes week in progress
             m = self.get_matchup_by_week(w)
+            if m is None or m.is_bye:
+                continue
             if m.home_team_id == self.team_id:
                 scores.append(m.home_score)
             else:

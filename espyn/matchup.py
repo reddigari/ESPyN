@@ -7,13 +7,18 @@ class Matchup:
     def __init__(self, sched_item, league, player_data=None):
         matchup = sched_item["matchups"][0]
         self.week = sched_item["matchupPeriodId"]
-        self.home_team_id = matchup["homeTeamId"]
-        self.away_team_id = matchup["awayTeamId"]
+        self.home_team_id = matchup.get("homeTeamId")
+        self.away_team_id = matchup.get("awayTeamId")
+        self.home_team = league.get_team_by_id(self.home_team_id)
+        if self.away_team_id is not None:
+            self.away_team = league.get_team_by_id(self.away_team_id)
+        self.is_bye = False
+        if matchup["isBye"]:
+            self.is_bye = True
+            return
         self.home_score = matchup["homeTeamScores"][0]
         self.away_score = matchup["awayTeamScores"][0]
         self._outcome_code = matchup["outcome"]
-        self.home_team = league.get_team_by_id(self.home_team_id)
-        self.away_team = league.get_team_by_id(self.away_team_id)
         self.home_data = None
         self.away_data = None
         self._boxscore_loaded = False
@@ -34,6 +39,9 @@ class Matchup:
     }
 
     def __repr__(self):
+        if self.is_bye:
+            return "Week {} : {} BYE WEEK".format(
+                self.week, self.home_team.owner)
         current = self.week == current_week()
         if current:
             verb = "currently playing"
