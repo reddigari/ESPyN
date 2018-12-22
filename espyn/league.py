@@ -50,6 +50,8 @@ class League:
         self.name = self._data["name"]
         self.size = self._data["size"]
         self.draft_order = self._data["draftOrder"]
+        self.reg_season_weeks = self._data["finalRegularSeasonMatchupPeriodId"]
+        self._matchup_week_map = self._data["scoringPeriodsByMatchupPeriod"]
         # set stat code to points map
         self.scoring_dict = dict()
         for item in self._data["scoringItems"]:
@@ -176,23 +178,36 @@ class League:
                 team_ids.pop(team_ids.index(team_id))
         return matchups
 
-    def all_scores(self):
+    def all_scores(self, include_playoffs=True):
         """
         Returns list of scores for all matchups up to (and excluding) current week
+        :param include_playoffs: whether to include scores from playoff matchups
         :return: list of team scores
         """
         scores = []
         cw = current_week()
+        cm = self.week_to_matchup_num(cw)
         for m in self._matchups:
-            if m.week >= cw:
+            if m.week >= cm or m.is_bye:
                 continue
-            scores.append(m.home_score)
-            scores.append(m.away_score)
+            if (not include_playoffs) and m.is_playoff:
+                continue
+            scores.extend(m.get_individual_scores())
         return scores
 
     def average_score(self):
         scores = self.all_scores()
         return float(sum(scores)) / len(scores)
+
+    def matchup_num_to_week(self, matchup_num):
+        num = str(matchup_num)
+        return self._matchup_week_map.get(num)
+
+    def week_to_matchup_num(self, week):
+        for m, wks in self._matchup_week_map.items():
+            if week in wks:
+                return int(m)
+        return None
 
     def to_json(self):
         res = dict()

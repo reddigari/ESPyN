@@ -48,18 +48,20 @@ class Team:
         else:
             return m.away_data
 
-    @property
-    def scores(self):
+    def scores(self, include_playoffs=True):
         scores = []
         cw = current_week()
-        for w in range(1, cw): # excludes week in progress
+        cm = self._league.week_to_matchup_num(cw)
+        for w in range(1, cm):  # excludes matchup in progress
             m = self.get_matchup_by_week(w)
             if m is None or m.is_bye:
                 continue
+            if (not include_playoffs) and m.is_playoff:
+                continue
             if m.home_team_id == self.team_id:
-                scores.append(m.home_score)
+                scores.extend(m.home_scores)
             else:
-                scores.append(m.away_score)
+                scores.extend(m.away_scores)
         return scores
 
     def current_roster(self):
@@ -86,5 +88,5 @@ class Team:
         res["ties"] = self.ties
         res["winning_pct"] = self.winning_pct
         res["transactions"] = self.acquisitions
-        res["scores"] = self.scores
+        res["scores"] = self.scores()
         return res

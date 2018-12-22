@@ -6,7 +6,10 @@ class Matchup:
 
     def __init__(self, sched_item, league, player_data=None):
         matchup = sched_item["matchups"][0]
-        self.week = sched_item["matchupPeriodId"]
+        self.week = sched_item["matchupPeriodId"]  # TODO call this matchup_num
+        self.is_playoff = self.week > league.reg_season_weeks
+        self.scoring_periods = league.matchup_num_to_week(self.week)  # TODO change argument
+        self.num_weeks = len(self.scoring_periods)
         self.home_team_id = matchup.get("homeTeamId")
         self.away_team_id = matchup.get("awayTeamId")
         self.home_team = league.get_team_by_id(self.home_team_id)
@@ -16,8 +19,10 @@ class Matchup:
         if matchup["isBye"]:
             self.is_bye = True
             return
-        self.home_score = matchup["homeTeamScores"][0]
-        self.away_score = matchup["awayTeamScores"][0]
+        self.home_score = sum(matchup["homeTeamScores"])
+        self.home_scores = matchup["homeTeamScores"]
+        self.away_score = sum(matchup["awayTeamScores"])
+        self.away_scores = matchup["awayTeamScores"]
         self._outcome_code = matchup["outcome"]
         self.home_data = None
         self.away_data = None
@@ -42,7 +47,7 @@ class Matchup:
         if self.is_bye:
             return "Week {} : {} BYE WEEK".format(
                 self.week, self.home_team.owner)
-        current = self.week == current_week()
+        current = current_week() in self.scoring_periods
         if current:
             verb = "currently playing"
         else:
@@ -80,3 +85,11 @@ class Matchup:
             res["home_data"] = [pw.to_json() for pw in self.home_data.slots]
             res["away_data"] = [pw.to_json() for pw in self.away_data.slots]
         return res
+
+    def get_individual_scores(self):
+        if self.is_bye:
+            return []
+        scores = []
+        scores.extend(self.home_scores)
+        scores.extend(self.away_scores)
+        return scores
