@@ -6,9 +6,9 @@ class Matchup:
 
     def __init__(self, sched_item, league, player_data=None):
         matchup = sched_item["matchups"][0]
-        self.week = sched_item["matchupPeriodId"]  # TODO call this matchup_num
-        self.is_playoff = self.week > league.reg_season_weeks
-        self.scoring_periods = league.matchup_num_to_week(self.week)  # TODO change argument
+        self.matchup_num = sched_item["matchupPeriodId"]
+        self.is_playoff = self.matchup_num > league.reg_season_weeks
+        self.scoring_periods = league.matchup_num_to_week(self.matchup_num)
         self.num_weeks = len(self.scoring_periods)
         self.home_team_id = matchup.get("homeTeamId")
         self.away_team_id = matchup.get("awayTeamId")
@@ -31,8 +31,14 @@ class Matchup:
             self.set_player_data(player_data)
 
     def set_player_data(self, player_data):
-        self.home_data = TeamWeek(player_data[0], self.home_team, self.week)
-        self.away_data = TeamWeek(player_data[1], self.away_team, self.week)
+        self.home_data = []
+        self.away_data = []
+        for week in self.scoring_periods:
+            h = TeamWeek(player_data[week]["teams"][0], self.home_team, week)
+            self.home_data.append(h)
+            if not self.is_bye:
+                a = TeamWeek(player_data[week]["teams"][1], self.home_team, week)
+                self.away_data.append(a)
         self._boxscore_loaded = True
 
     # outcome verb from home team's perspective
@@ -46,7 +52,7 @@ class Matchup:
     def __repr__(self):
         if self.is_bye:
             return "Week {} : {} BYE WEEK".format(
-                self.week, self.home_team.owner)
+                self.matchup_num, self.home_team.owner)
         current = current_week() in self.scoring_periods
         if current:
             verb = "currently playing"
@@ -55,9 +61,9 @@ class Matchup:
         h = self.home_team.owner
         a = self.away_team.owner
         if (self._outcome_code == 0) & (not current):
-            return "Week {} : {} {} {}".format(self.week, h, verb, a)
+            return "Week {} : {} {} {}".format(self.matchup_num, h, verb, a)
         return "Week {} : {} {} {}, {} to {}".format(
-            self.week, h, verb, a, self.home_score, self.away_score
+            self.matchup_num, h, verb, a, self.home_score, self.away_score
         )
 
     @property
@@ -72,7 +78,7 @@ class Matchup:
 
     def to_json(self):
         res = dict()
-        res["week"] = self.week
+        res["week"] = self.matchup_num
         res["team_ids"] = self.team_ids
         res["home_team_id"] = self.home_team_id
         res["away_team_id"] = self.away_team_id

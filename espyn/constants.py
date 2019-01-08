@@ -6,12 +6,19 @@ SLOTS = {
     3: "RB/WR",
     4: "WR",
     6: "TE",
+    7: "OP",  # offensive utility player
+    10: "LB",
+    11: "DL",
+    14: "DB",
+    15: "DP", # defensive utility player
     16: "D/ST",
     17: "K",
+    18: "P",
     19: "COACH",
     20: "BENCH",
     21: "INJURED",
-    23: "FLEX"
+    23: "FLEX",
+    24: "EDR"  # edge rusher
 }
 
 POSITIONS = {
@@ -20,6 +27,12 @@ POSITIONS = {
     3: "WR",
     4: "TE",
     5: "K",
+    7: "P",
+    9: "DT",
+    10: "DE",
+    11: "LB",
+    12: "CB",
+    13: "S",  # safety
     14: "COACH",
     16: "D/ST"
 }

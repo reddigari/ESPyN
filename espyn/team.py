@@ -50,8 +50,7 @@ class Team:
 
     def scores(self, include_playoffs=True):
         scores = []
-        cw = current_week()
-        cm = self._league.week_to_matchup_num(cw)
+        cm = self._league.current_matchup_num()
         for w in range(1, cm):  # excludes matchup in progress
             m = self.get_matchup_by_week(w)
             if m is None or m.is_bye:

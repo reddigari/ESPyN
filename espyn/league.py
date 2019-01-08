@@ -51,6 +51,7 @@ class League:
         self.size = self._data["size"]
         self.draft_order = self._data["draftOrder"]
         self.reg_season_weeks = self._data["finalRegularSeasonMatchupPeriodId"]
+        self.total_matchups = self._data["finalMatchupPeriodId"]
         self._matchup_week_map = self._data["scoringPeriodsByMatchupPeriod"]
         # set stat code to points map
         self.scoring_dict = dict()
@@ -66,13 +67,13 @@ class League:
         for t_id, td in team_data.items():
             for si in td["scheduleItems"]:
                 matchup = Matchup(si, self)
-                week = matchup.week
+                mn = matchup.matchup_num
                 # add matchup and index for both teams if it doesn't exist
-                if self._lookup_matchup(week, int(t_id)) is None:
+                if self._lookup_matchup(mn, int(t_id)) is None:
                     self._matchups.append(matchup)
-                    week_dict = self._matchup_dict.setdefault(week, dict())
+                    tmp = self._matchup_dict.setdefault(mn, dict())
                     for i in matchup.team_ids:
-                        week_dict[i] = index
+                        tmp[i] = index
                     index += 1
 
     def __repr__(self):
@@ -125,45 +126,49 @@ class League:
         if self._cache:
             data = self._load_cached_boxscore(matchup)
             if data:
-                return data["boxscore"]
+                return data
         url = self._endpoint + "boxscore"
         params = self._url_params()
-        params["matchupPeriodId"] = matchup.week
         params["teamId"] = matchup.home_team_id
-        logging.info("Requesting matchup data from ESPN.")
-        data = self._request_json(url, params)
-        # cache data if using cache and week is over
-        if (self._cache is not None) & (matchup.week < current_week()):
-            self._cache_boxscore(data, matchup)
-        return data["boxscore"]
+        params["matchupPeriodId"] = matchup.matchup_num
+        all_data = dict()
+        for week in matchup.scoring_periods:
+            params["scoringPeriodId"] = week
+            logging.info("Requesting matchup data from ESPN.")
+            data = self._request_json(url, params)
+            all_data[week] = data["boxscore"]
+            # cache data if using cache and week is over
+            if (self._cache is not None) &\
+                    (matchup.matchup_num < self.current_matchup_num()):
+                self._cache_boxscore(data, matchup, week)
+        return all_data
 
-    def _lookup_matchup(self, week, team_id):
+    def _lookup_matchup(self, matchup_num, team_id):
         try:
-            matchup_idx = self._matchup_dict[week][team_id]
+            matchup_idx = self._matchup_dict[matchup_num][team_id]
             return self._matchups[matchup_idx]
         except KeyError:
             return None
 
-    def get_matchup(self, week, team_id, stats=False):
+    def get_matchup(self, number, team_id, stats=False):
         """
         Returns matchup from specified week involving specified team.
-        :param week: week of matchup
+        :param number: matchup number (usually a week number during reg season)
         :param team_id: integer team ID
         :param stats: whether to load boxscore (will require Internet
                       connection if data not cached)
         :return: specified matchup
         """
-        matchup = self._lookup_matchup(week, team_id)
+        matchup = self._lookup_matchup(number, team_id)
         if stats:
-            data = self._get_boxscore_data(matchup)
-            player_data = data["teams"]
-            matchup.set_player_data(player_data)
+            box = self._get_boxscore_data(matchup)
+            matchup.set_player_data(box)
         return matchup
 
-    def get_matchups_by_week(self, week, stats=False):
+    def get_matchups_by_number(self, number, stats=False):
         """
-        Returns all matchups from specified week
-        :param week: week of matchups
+        Returns all matchups from specified week/number
+        :param number: week/matchup number
         :param stats: whether to load boxscore (will require Internet
                       connection if data not cached)
         :return:  list of specified matchups
@@ -172,10 +177,11 @@ class League:
         team_ids = [team.team_id for team in self.teams]
         while len(team_ids) > 0:
             t_id = team_ids[0]
-            matchup = self.get_matchup(week, t_id, stats)
+            matchup = self.get_matchup(number, t_id, stats)
             matchups.append(matchup)
             for team_id in matchup.team_ids:
-                team_ids.pop(team_ids.index(team_id))
+                if team_id is not None:
+                    team_ids.pop(team_ids.index(team_id))
         return matchups
 
     def all_scores(self, include_playoffs=True):
@@ -185,10 +191,9 @@ class League:
         :return: list of team scores
         """
         scores = []
-        cw = current_week()
-        cm = self.week_to_matchup_num(cw)
+        cm = self.current_matchup_num()
         for m in self._matchups:
-            if m.week >= cm or m.is_bye:
+            if m.matchup_num >= cm or m.is_bye:
                 continue
             if (not include_playoffs) and m.is_playoff:
                 continue
@@ -209,6 +214,14 @@ class League:
                 return int(m)
         return None
 
+    def current_matchup_num(self):
+        cw = current_week()
+        mn = self.week_to_matchup_num(cw)
+        if mn is not None:
+            return mn
+        else:
+            return 999
+
     def to_json(self):
         res = dict()
         res["league_id"] = self.league_id
@@ -228,10 +241,10 @@ class League:
     def _get_league_fname(self):
         return "{}_settings.json".format(self.league_id)
 
-    def _get_fname_from_matchup(self, matchup):
+    def _get_fname_from_matchup(self, matchup, week):
         # name by week and home team ID
         fname = "{0}_{1:0>2}_{2:0>2}.json".format(
-            self.league_id, matchup.week, matchup.home_team_id
+            self.league_id, week, matchup.home_team_id
         )
         return fname
 
@@ -240,13 +253,19 @@ class League:
         return self._cache.read_from_cache(fname)
 
     def _load_cached_boxscore(self, matchup):
-        fname = self._get_fname_from_matchup(matchup)
-        return self._cache.read_from_cache(fname)
+        all_data = dict()
+        for week in matchup.scoring_periods:
+            fname = self._get_fname_from_matchup(matchup, week)
+            data = self._cache.read_from_cache(fname)
+            if data is None:
+                return None
+            all_data[week] = data["boxscore"]
+        return all_data
 
     def _cache_league(self, data):
         fname = self._get_league_fname()
         self._cache.write_to_cache(data, fname)
 
-    def _cache_boxscore(self, data, matchup):
-        fname = self._get_fname_from_matchup(matchup)
+    def _cache_boxscore(self, data, matchup, week):
+        fname = self._get_fname_from_matchup(matchup, week)
         self._cache.write_to_cache(data, fname)
