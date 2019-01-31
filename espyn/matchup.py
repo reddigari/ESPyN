@@ -6,6 +6,7 @@ class Matchup:
 
     def __init__(self, sched_item, league, player_data=None):
         matchup = sched_item["matchups"][0]
+        self._boxscore_loaded = False
         self.matchup_num = sched_item["matchupPeriodId"]
         self.is_playoff = self.matchup_num > league.reg_season_weeks
         self.scoring_periods = league.matchup_num_to_week(self.matchup_num)
@@ -26,7 +27,6 @@ class Matchup:
         self._outcome_code = matchup["outcome"]
         self.home_data = None
         self.away_data = None
-        self._boxscore_loaded = False
         if player_data:
             self.set_player_data(player_data)
 
@@ -78,18 +78,23 @@ class Matchup:
 
     def to_json(self):
         res = dict()
-        res["week"] = self.matchup_num
+        res["matchup_num"] = self.matchup_num
         res["team_ids"] = self.team_ids
         res["home_team_id"] = self.home_team_id
         res["away_team_id"] = self.away_team_id
-        res["home_score"] = self.home_score
-        res["away_score"] = self.away_score
-        res["outcome"] = self._outcome_code
+        if not self.is_bye:
+            res["home_score"] = self.home_score
+            res["away_score"] = self.away_score
+            res["outcome"] = self._outcome_code
+        res["is_bye"] = self.is_bye
+        res["scoring_periods"] = self.scoring_periods
+        res["num_weeks"] = self.num_weeks
+        res["is_playoff"] = self.is_playoff
         res["home_data"] = None
         res["away_data"] = None
         if self._boxscore_loaded:
-            res["home_data"] = [pw.to_json() for pw in self.home_data.slots]
-            res["away_data"] = [pw.to_json() for pw in self.away_data.slots]
+            res["home_data"] = [[pw.to_json() for pw in data.slots] for data in self.home_data]
+            res["away_data"] = [[pw.to_json() for pw in data.slots] for data in self.away_data]
         return res
 
     def get_individual_scores(self):

@@ -228,7 +228,9 @@ class League:
         res["league_name"] = self.name
         res["league_size"] = self.size
         res["teams"] = [t.to_json() for t in self.teams]
-        matchups = sorted(self._matchups, key=lambda i: i.week)
+        res["reg_season_weeks"] = self.reg_season_weeks
+        res["total_matchups"] = self.total_matchups
+        matchups = sorted(self._matchups, key=lambda i: i.matchup_num)
         res["matchups"] = [m.to_json() for m in matchups]
         res["all_scores"] = self.all_scores()
         return res
