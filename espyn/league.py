@@ -1,4 +1,4 @@
-import urllib2
+import urllib
 import logging
 import json
 
@@ -17,10 +17,10 @@ class League:
         for k, v in params.items():
             url += "{}={}&".format(k, v)
         try:
-            res = urllib2.urlopen(url)
+            res = urllib.request.urlopen(url)
             raw = res.read()
             return json.loads(raw.decode("windows-1252"))
-        except urllib2.URLError:
+        except urllib.request.URLError:
             return None
 
     def __init__(self, league_id, season=None, cache=None,
