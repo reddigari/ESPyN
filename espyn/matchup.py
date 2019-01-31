@@ -37,7 +37,7 @@ class Matchup:
             h = TeamWeek(player_data[week]["teams"][0], self.home_team, week)
             self.home_data.append(h)
             if not self.is_bye:
-                a = TeamWeek(player_data[week]["teams"][1], self.home_team, week)
+                a = TeamWeek(player_data[week]["teams"][1], self.away_team, week)
                 self.away_data.append(a)
         self._boxscore_loaded = True
 
