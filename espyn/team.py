@@ -87,5 +87,6 @@ class Team:
         res["ties"] = self.ties
         res["winning_pct"] = self.winning_pct
         res["transactions"] = self.acquisitions
+        res["draft_position"] = self.draft_position
         res["scores"] = self.scores()
         return res
