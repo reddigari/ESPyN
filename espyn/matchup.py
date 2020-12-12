@@ -1,7 +1,3 @@
-from .team_week import TeamWeek
-from .utils import current_week
-
-
 class Matchup:
 
     def __init__(self, matchup_data, league):
@@ -42,20 +38,24 @@ class Matchup:
         else:
             return None
 
-    # def set_player_data(self, player_data):
-    #     self.home_data = []
-    #     self.away_data = []
-    #     for week in self.scoring_periods:
-    #         h = TeamWeek(player_data[week]["teams"][0], self.home_team, week)
-    #         self.home_data.append(h)
-    #         if not self.is_bye:
-    #             a = TeamWeek(player_data[week]["teams"][1], self.away_team, week)
-    #             self.away_data.append(a)
-    #     self._boxscore_loaded = True
-
     @property
     def team_ids(self):
         return [self.home_team_id, self.away_team_id]
+
+    def __repr__(self):
+        WINNER_SYM = chr(0x2705)
+        prog = " (in progress)" if self.winner == "UNDECIDED" else ""
+        prefix = f"Matchup #{self.matchup_num}{prog}"
+        home_exp = "{} ({})".format(
+            self.home_team.full_name, self.home_score)
+        if self.is_bye:
+            return f"{prefix} : {home_exp} : BYE"
+        away_exp = f"{self.away_team.full_name} ({self.away_score})"
+        if self.winner == "HOME":
+            home_exp += WINNER_SYM
+        elif self.winner == "AWAY":
+            away_exp += WINNER_SYM
+        return f"{prefix} : {away_exp} @ {home_exp}"
 
     @property
     def all_data(self):
@@ -79,9 +79,6 @@ class Matchup:
         res["is_playoff"] = self.is_playoff
         res["home_data"] = None
         res["away_data"] = None
-        # if self._boxscore_loaded:
-        #     res["home_data"] = [[pw.to_json() for pw in data.slots] for data in self.home_data]
-        #     res["away_data"] = [[pw.to_json() for pw in data.slots] for data in self.away_data]
         return res
 
     def get_individual_scores(self):
