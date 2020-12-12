@@ -126,8 +126,8 @@ class League:
                       connection if data not cached)
         :return:  list of specified matchups
         """
-        matchups = list(self._matchup_dict[number].values())
-        return matchups
+        idx = set(self._matchup_dict[number].values())
+        return [self._matchups[i] for i in idx]
 
     def all_scores(self, include_playoffs=True):
         """
