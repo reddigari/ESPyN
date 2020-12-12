@@ -1,4 +1,6 @@
-ENDPOINT = "https://games.espn.com/ffl/api/v2/"
+ENDPOINT = ("https://fantasy.espn.com/apis/v3/games/ffl/seasons/{}/segments/0/leagues/{}"
+            "?view=mMatchupScore&view=mScoreboard&view=mSettings&view=mStatus&view=mTeam"
+            "&view=modular&view=mNav&view=mBoxscore")
 
 SLOTS = {
     0: "QB",
@@ -116,3 +118,5 @@ STAT_CODES = {
     135: "500-549_yds_allowed",
     136: "550+_yds_allowed"
 }
+
+SEASON_OVER = 999
