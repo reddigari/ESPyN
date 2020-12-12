@@ -1,27 +1,29 @@
 from .utils import current_week
+from .constants import SEASON_OVER
 
 
 class Team:
 
     def __init__(self, team_data, league):
         self._league = league
-        self.team_id = team_data["teamId"]
-        self.team_abbrev = team_data["teamAbbrev"]
-        self.team_location = team_data["teamLocation"]
-        self.team_nickname = team_data["teamNickname"]
-        try:
-            self.owner = team_data["owners"][0]["firstName"]
-        except KeyError:
-            self.owner = "Team {} Owner".format(self.team_id)
-        self.division_id = team_data["division"]["divisionId"]
-        record = team_data["record"]
+        self.team_id = team_data["id"]
+        self.team_abbrev = team_data["abbrev"]
+        self.team_location = team_data["location"]
+        self.team_nickname = team_data["nickname"]
+        if team_data.get("owners"):
+            self.owner = league.name_from_user_id(team_data["owners"][0])
+        else:
+            self.owner = "<NO OWNER>"
+        self.division_id = team_data["divisionId"]
+        record = team_data["record"]["overall"]
         self.points_for = record["pointsFor"]
         self.points_against = record["pointsAgainst"]
-        self.wins = record["overallWins"]
-        self.losses = record["overallLosses"]
-        self.ties = record["overallTies"]
-        self.winning_pct = record["overallPercentage"]
-        self.acquisitions = team_data["teamTransactions"]["overallAcquisitionTotal"]
+        self.wins = record["wins"]
+        self.losses = record["losses"]
+        self.ties = record["ties"]
+        self.winning_pct = record["percentage"]
+        self.transactions = team_data["transactionCounter"]
+        self.acquisitions = self.transactions["acquisitions"]
         self.draft_position = league.draft_order.index(self.team_id) + 1
 
     def __repr__(self):
@@ -51,6 +53,8 @@ class Team:
     def scores(self, include_playoffs=True):
         scores = []
         cm = self._league.current_matchup_num()
+        if cm == SEASON_OVER:
+            cm = self._league.total_matchups + 1
         for w in range(1, cm):  # excludes matchup in progress
             m = self.get_matchup_by_week(w)
             if m is None or m.is_bye:
@@ -62,15 +66,6 @@ class Team:
             else:
                 scores.extend(m.away_scores)
         return scores
-
-    def current_roster(self):
-        cw = current_week()
-        m = self.get_matchup_by_week(cw, True)
-        if m.home_team_id == self.team_id:
-            data = m.home_data
-        else:
-            data = m.away_data
-        return [s.player for s in data.slots]
 
     def to_json(self):
         res = dict()
