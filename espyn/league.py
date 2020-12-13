@@ -145,8 +145,8 @@ class League:
             scores.extend(m.get_individual_scores())
         return scores
 
-    def average_score(self):
-        scores = self.all_scores()
+    def average_score(self, include_playoffs=True):
+        scores = self.all_scores(include_playoffs)
         return float(sum(scores)) / len(scores)
 
     def matchup_num_to_week(self, matchup_num):
