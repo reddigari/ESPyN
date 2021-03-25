@@ -22,7 +22,9 @@ class League:
 
     def __init__(self, league_id, season=None, cache=None,
                  try_cache=False):
-        self._cache = cache
+        if cache:
+            self._cache = cache
+            self._cache.set_league(self)
         self._endpoint = ENDPOINT
         self.league_id = league_id
         if season is None:
@@ -86,6 +88,10 @@ class League:
         return self._teams[team_id]
 
     def _get_league_data(self, try_cache=False):
+        if try_cache:
+            data = self._cache.load()
+            if data:
+                return data
         logging.info("Requesting league settings from ESPN for %d." % self.league_id)
         data = self._request_json(
             self._endpoint.format(self.season, self.league_id))
@@ -93,7 +99,7 @@ class League:
             raise ValueError("That league is not publicly accessible.")
         # cache if using cache
         if self._cache:
-            self._cache_league(data)
+            self._cache.save(data)
         return data
 
     def _lookup_matchup(self, matchup_num, team_id):
