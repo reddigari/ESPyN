@@ -5,21 +5,23 @@ from .constants import SLOTS, STAT_CODES
 class PlayerWeek:
 
     def __init__(self, stat_data):
-        self.player = Player(stat_data["player"])
-        self.slot_id = stat_data["slotCategoryId"]
+        ppe = stat_data["playerPoolEntry"]
+        self.player = Player(ppe["player"])
+        self.slot_id = stat_data["lineupSlotId"]
         self.slot = SLOTS[self.slot_id]
-        real = stat_data["currentPeriodRealStats"]
-        proj = stat_data["currentPeriodProjectedStats"]
-        self.points = real.get("appliedStatTotal")
-        self.projected_points = proj.get("appliedStatTotal")
-        self._coded_stats = {}
-        self._coded_proj = {}
-        if real.get("rawStats"):
-            self._coded_stats = {
-                int(k): v for k, v in real["rawStats"].items()
+        stats_arr = ppe["player"]["stats"]
+        real = stats_arr[0]
+        proj = stats_arr[1] if len(stats_arr) == 2 else dict()
+        self.points = ppe["appliedStatTotal"]
+        self.projected_points = proj.get("appliedTotal") or 0.
+        self._coded_stats, self._coded_proj = dict(), dict()
+        self._coded_stats = {
+            int(k): v for k, v in real["stats"].items()
+        }
+        if proj.get("stats"):
+            self._coded_proj = {
+                int(k): v for k, v in proj["stats"].items()
             }
-        if proj.get("rawStats"):
-            self._coded_proj = {int(k): v for k, v in proj["rawStats"].items()}
 
     def __repr__(self):
         pts_str = "Inactive" if self.points is None else "%0.1f points" % self.points
