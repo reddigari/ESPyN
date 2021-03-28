@@ -102,6 +102,22 @@ class League:
             self._cache.save(data)
         return data
 
+    def _get_scoring_period_data(self, scoring_period, try_cache=False):
+        if try_cache:
+            data = self._cache.load(scoring_period)
+            if data:
+                return data
+        logging.info("Requesting boxscore data from ESPN for %d, period %d."
+                     % (self.league_id, scoring_period))
+        url = self._endpoint.format(self.season, self.league_id)
+        url += f"&scoringPeriodId={scoring_period}"
+        data = self._request_json(url)
+        if data is None:
+            raise RuntimeError("Failed to request scoring period data.")
+        if self._cache:
+            self._cache.save(data, scoring_period)
+        return data
+
     def _lookup_matchup(self, matchup_num, team_id):
         try:
             matchup_idx = self._matchup_dict[matchup_num][team_id]
