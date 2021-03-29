@@ -31,9 +31,10 @@ class League:
             self.season = current_season()
         else:
             self.season = season
+        self._try_cache = try_cache
 
         # fetch league data
-        self._data = self._get_league_data(try_cache)
+        self._data = self._get_league_data()
         settings = self._data["settings"]
         self.name = settings["name"]
         self.size = settings["size"]
@@ -87,8 +88,8 @@ class League:
         """
         return self._teams[team_id]
 
-    def _get_league_data(self, try_cache=False):
-        if try_cache:
+    def _get_league_data(self):
+        if self._try_cache:
             data = self._cache.load()
             if data:
                 return data
@@ -102,8 +103,8 @@ class League:
             self._cache.save(data)
         return data
 
-    def _get_scoring_period_data(self, scoring_period, try_cache=False):
-        if try_cache:
+    def _get_scoring_period_data(self, scoring_period):
+        if self._try_cache:
             data = self._cache.load(scoring_period)
             if data:
                 return data
@@ -118,13 +119,13 @@ class League:
             self._cache.save(data, scoring_period)
         return data
 
-    def _populate_boxscores(self, matchup_num, try_cache=False):
+    def _populate_boxscores(self, matchup_num):
         scoring_periods = self.matchup_num_to_week(matchup_num)
         if scoring_periods is None:
             raise ValueError(
                 "This league does not have a matchup number %d." % matchup_num)
         for sp in scoring_periods:
-            data = self._get_scoring_period_data(sp, try_cache=try_cache)
+            data = self._get_scoring_period_data(sp)
             data = [i for i in data["schedule"] if i["matchupPeriodId"] == matchup_num]
             # for each matchup in this period, lookup Matchup object
             # by home team ID, and set the boxscore data
