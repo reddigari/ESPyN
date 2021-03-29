@@ -118,6 +118,20 @@ class League:
             self._cache.save(data, scoring_period)
         return data
 
+    def _populate_boxscores(self, matchup_num, try_cache=False):
+        scoring_periods = self.matchup_num_to_week(matchup_num)
+        if scoring_periods is None:
+            raise ValueError(
+                "This league does not have a matchup number %d." % matchup_num)
+        for sp in scoring_periods:
+            data = self._get_scoring_period_data(sp, try_cache=try_cache)
+            data = [i for i in data["schedule"] if i["matchupPeriodId"] == matchup_num]
+            # for each matchup in this period, lookup Matchup object
+            # by home team ID, and set the boxscore data
+            for datum in data:
+                m = self.get_matchup(matchup_num, datum["home"]["teamId"])
+                m.set_boxscore_data(datum, sp)
+
     def _lookup_matchup(self, matchup_num, team_id):
         try:
             matchup_idx = self._matchup_dict[matchup_num][team_id]
