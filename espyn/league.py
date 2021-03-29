@@ -140,31 +140,35 @@ class League:
         except KeyError:
             return None
 
-    def get_matchup(self, number, team_id, stats=False):
+    def get_matchup(self, number, team_id, boxscore=False):
         """
         Returns matchup from specified week involving specified team.
         :param number: matchup number (usually a week number during reg season)
         :param team_id: integer team ID
-        :param stats: whether to load boxscore (will require Internet
-                      connection if data not cached)
+        :param boxscore: whether to load boxscore (will require Internet
+                         connection if data not cached)
         :return: specified matchup
         """
         matchup = self._lookup_matchup(number, team_id)
-        if stats:
-            box = self._get_boxscore_data(matchup)
-            matchup.set_player_data(box)
+        if boxscore:
+            if not matchup.boxscore_loaded:
+                self._populate_boxscores(number)
         return matchup
 
-    def get_matchups_by_number(self, number, stats=False):
+    def get_matchups_by_number(self, number, boxscore=False):
         """
         Returns all matchups from specified week/number
         :param number: week/matchup number
-        :param stats: whether to load boxscore (will require Internet
-                      connection if data not cached)
+        :param boxscore: whether to load boxscore (will require Internet
+                         connection if data not cached)
         :return:  list of specified matchups
         """
         idx = set(self._matchup_dict[number].values())
-        return [self._matchups[i] for i in idx]
+        matchups = [self._matchups[i] for i in idx]
+        if boxscore:
+            if not all(i.boxscore_loaded for i in matchups):
+                self._populate_boxscores(number)
+        return matchups
 
     def all_scores(self, include_playoffs=True):
         """
