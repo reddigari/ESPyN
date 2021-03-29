@@ -10,6 +10,8 @@ class PlayerWeek:
         self.slot_id = stat_data["lineupSlotId"]
         self.slot = SLOTS[self.slot_id]
         stats_arr = ppe["player"]["stats"]
+        if not stats_arr:
+            return
         real = stats_arr[0]
         proj = stats_arr[1] if len(stats_arr) == 2 else dict()
         self.points = ppe["appliedStatTotal"]

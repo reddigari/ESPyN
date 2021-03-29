@@ -12,8 +12,11 @@ class Player:
         self.player_id = player_data["id"]
         self._pro_team_id = player_data["proTeamId"]
         self.pro_team = PRO_TEAMS[self._pro_team_id]
-        self._pro_team_id_during_match = player_data["stats"][0]["proTeamId"]
-        self.pro_team_during_match = PRO_TEAMS[self._pro_team_id_during_match]
+        if player_data.get("stats"):
+            self._pro_team_id_during_match = player_data["stats"][0]["proTeamId"]
+            self.pro_team_during_match = PRO_TEAMS[self._pro_team_id_during_match]
+        else:
+            self.pro_team_during_match = None
 
     @property
     def full_name(self):
