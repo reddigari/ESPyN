@@ -1,13 +1,20 @@
+from .team_week import TeamWeek
+
+
 class Matchup:
 
     def __init__(self, matchup_data, league):
         self._data = matchup_data
         self._league = league
         self.matchup_num = self._data["matchupPeriodId"]
-        self._boxscore_loaded = False
+        self.scoring_periods = league.matchup_num_to_week(self.matchup_num)
+        self._boxscore_data = {
+            "home": {i: None for i in self.scoring_periods},
+            "away": {i: None for i in self.scoring_periods},
+        }
+        self._boxscore_loaded = {i: False for i in self.scoring_periods}
         self.is_playoff = self.matchup_num > league.reg_season_weeks
         self.is_bye = False  # change upon inspection of data
-        self.scoring_periods = league.matchup_num_to_week(self.matchup_num)
         self.num_weeks = len(self.scoring_periods)
         self.home_team_id = self._data["home"]["teamId"]
         self.home_score = self._data["home"]["totalPoints"]
@@ -24,8 +31,31 @@ class Matchup:
             self.away_score = None
             self.away_scores = []
         self.winner = self._data["winner"]
-        self.home_data = None
-        self.away_data = None
+
+    @property
+    def boxscore_loaded(self):
+        return all(self._boxscore_loaded.values())
+
+    @property
+    def home_data(self):
+        if not self.boxscore_loaded:
+            return None
+        return [self._boxscore_data["home"][i] for i in self.scoring_periods]
+
+    @property
+    def away_data(self):
+        if not self.boxscore_loaded or self.is_bye:
+            return None
+        return [self._boxscore_data["away"][i] for i in self.scoring_periods]
+
+    def set_boxscore_data(self, data, scoring_period):
+        assert "rosterForCurrentScoringPeriod" in data["home"]
+        self._boxscore_data["home"][scoring_period] = TeamWeek(
+            data["home"], scoring_period)
+        if not self.is_bye:
+            self._boxscore_data["away"][scoring_period] = TeamWeek(
+                data["away"], scoring_period)
+        self._boxscore_loaded[scoring_period] = True
 
     @property
     def home_team(self):
