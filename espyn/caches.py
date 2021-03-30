@@ -45,36 +45,3 @@ class LocalCache(Cache):
         with open(fpath, "w") as f:
             json.dump(data, f)
         logging.info(f"Wrote file {fname} to local cache.")
-
-
-class GoogleCloudStorageCache(Cache):
-
-    def __init__(self):
-        from google.cloud import storage
-
-        gac = os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
-        bucket_name = os.environ.get("BUCKET_NAME")
-        if gac is None or bucket_name is None:
-            msg = ("You must set the environment variables 'GOOGLE_APPLICATION_CREDENTIALS'"
-                   "and 'BUCKET_NAME' in order to use a Cloud Storage cache.")
-            raise RuntimeError(msg)
-        try:
-            self._client = storage.Client()
-            self._bucket = self._client.get_bucket(bucket_name)
-        except:
-            raise RuntimeError("Unable to connect to the specified Cloud Storage bucket.")
-
-    def load(self, scoring_period=None):
-        fname = self._get_filename(scoring_period)
-        blob = self._bucket.get_blob(fname)
-        if blob:
-            raw = blob.download_as_string()
-            logging.info(f"Read file {fname} from Cloud Storage.")
-            return json.loads(raw)
-        return None
-
-    def save(self, data, scoring_period=None):
-        fname = self._get_filename(scoring_period)
-        blob = self._bucket.blob(fname)
-        blob.upload_from_string(json.dumps(data))
-        logging.info("Wrote file {fname} to Cloud Storage.")
