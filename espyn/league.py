@@ -20,8 +20,7 @@ class League:
         except urllib.request.URLError:
             return None
 
-    def __init__(self, league_id, season=None, cache=None,
-                 try_cache=False):
+    def __init__(self, league_id, season=None, cache=None):
         if cache:
             self._cache = cache
             self._cache.set_league(self)
@@ -31,7 +30,6 @@ class League:
             self.season = current_season()
         else:
             self.season = season
-        self._try_cache = try_cache
 
         # fetch league data
         self._data = self._get_league_data()
@@ -89,7 +87,7 @@ class League:
         return self._teams[team_id]
 
     def _get_league_data(self):
-        if self._try_cache:
+        if self._cache:
             data = self._cache.load()
             if data:
                 return data
@@ -104,7 +102,7 @@ class League:
         return data
 
     def _get_scoring_period_data(self, scoring_period):
-        if self._try_cache:
+        if self._cache:
             data = self._cache.load(scoring_period)
             if data:
                 return data

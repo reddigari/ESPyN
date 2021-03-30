@@ -23,12 +23,15 @@ class Cache:
 
 class LocalCache(Cache):
 
-    def __init__(self, cache_dir):
+    def __init__(self, cache_dir, ignore_cache=False):
         if not os.path.exists(cache_dir):
             raise ValueError("The given cache directory does not exist.")
         self.cache_dir = cache_dir
+        self.ignore_cache = ignore_cache
 
     def load(self, scoring_period=None):
+        if self.ignore_cache:
+            return None
         fname = self._get_filename(scoring_period)
         fpath = os.path.join(self.cache_dir, fname)
         try:
