@@ -48,3 +48,22 @@ class LocalCache(Cache):
         with open(fpath, "w") as f:
             json.dump(data, f)
         logging.info(f"Wrote file {fname} to local cache.")
+
+
+def cache_operation(func):
+    def wrapped(*args):
+        cache = getattr(args[0], "cache")
+        # if no cache, call the wrapped function as-is
+        if cache is None:
+            return func(*args)
+        # otherwise, try returning data from cache
+        data = cache.load(*args[1:])
+        if data:
+            return data
+        # if the cache missed, call the wrapped function,
+        # then write the data to the cache
+        data = func(*args)
+        cache.save(data, *args[1:])
+        return data
+
+    return wrapped

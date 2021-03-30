@@ -6,6 +6,7 @@ from .constants import ENDPOINT, SEASON_OVER
 from .team import Team
 from .matchup import Matchup
 from .utils import *
+from .caches import cache_operation
 
 
 class League:
@@ -21,8 +22,8 @@ class League:
 
     def __init__(self, league_id, season=None, cache=None):
         if cache:
-            self._cache = cache
-            self._cache.set_league(self)
+            self.cache = cache
+            self.cache.set_league(self)
         self._endpoint = ENDPOINT
         self.league_id = league_id
         if season is None:
@@ -85,26 +86,17 @@ class League:
         """
         return self._teams[team_id]
 
+    @cache_operation
     def _get_league_data(self):
-        if self._cache:
-            data = self._cache.load()
-            if data:
-                return data
         logging.info("Requesting league settings from ESPN for %d." % self.league_id)
         data = self._request_json(
             self._endpoint.format(self.season, self.league_id))
         if data is None:
             raise ValueError("That league is not publicly accessible.")
-        # cache if using cache
-        if self._cache:
-            self._cache.save(data)
         return data
 
+    @cache_operation
     def _get_scoring_period_data(self, scoring_period):
-        if self._cache:
-            data = self._cache.load(scoring_period)
-            if data:
-                return data
         logging.info("Requesting boxscore data from ESPN for %d, period %d."
                      % (self.league_id, scoring_period))
         url = self._endpoint.format(self.season, self.league_id)
@@ -112,8 +104,6 @@ class League:
         data = self._request_json(url)
         if data is None:
             raise RuntimeError("Failed to request scoring period data.")
-        if self._cache:
-            self._cache.save(data, scoring_period)
         return data
 
     def _populate_boxscores(self, matchup_num):
