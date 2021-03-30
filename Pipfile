@@ -5,6 +5,8 @@ verify_ssl = true
 
 [dev-packages]
 ipython = "*"
+pytest = "*"
+pytest-cov = "*"
 
 [packages]
 "espyn" = {path = ".", editable = true}
