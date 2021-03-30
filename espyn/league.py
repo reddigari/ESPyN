@@ -6,7 +6,6 @@ from .constants import ENDPOINT, SEASON_OVER
 from .team import Team
 from .matchup import Matchup
 from .utils import *
-from .caches import LocalCache
 
 
 class League:
