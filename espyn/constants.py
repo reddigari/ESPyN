@@ -1,4 +1,6 @@
-ENDPOINT = "https://games.espn.com/ffl/api/v2/"
+ENDPOINT = ("https://fantasy.espn.com/apis/v3/games/ffl/seasons/{}/segments/0/leagues/{}"
+            "?view=mMatchupScore&view=mScoreboard&view=mSettings&view=mStatus&view=mTeam"
+            "&view=modular&view=mNav&view=mBoxscore")
 
 SLOTS = {
     0: "QB",
@@ -51,7 +53,7 @@ PRO_TEAMS = {
     10: "TEN",
     11: "IND",
     12: "KC",
-    13: "OAK",
+    13: "LV",
     14: "LAR",
     15: "MIA",
     16: "MIN",
@@ -94,6 +96,7 @@ STAT_CODES = {
     58: "tgt",
     60: "rec_yds_per_rec",
     72: "fum_lost",
+    89: "0_pts_allowed",
     90: "1-6_pts_allowed",
     91: "7-13_pts_allowed",
     92: "14-17_pts_allowed",
@@ -102,6 +105,8 @@ STAT_CODES = {
     97: "block",
     98: "safety",
     99: "sack",
+    101: "td_ko_return",
+    102: "td_punt_return",
     103: "td_int_return",
     104: "td_fum_return",
     123: "28-34_pts_allowed",
@@ -116,3 +121,5 @@ STAT_CODES = {
     135: "500-549_yds_allowed",
     136: "550+_yds_allowed"
 }
+
+SEASON_OVER = 999

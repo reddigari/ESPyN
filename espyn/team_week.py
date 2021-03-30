@@ -3,18 +3,15 @@ from .player_week import PlayerWeek
 
 class TeamWeek:
 
-    def __init__(self, week_data, team, week):
-        self.week = week
-        self.team = team
-        self.points = week_data["appliedActiveRealTotal"]
-        self.bench_points = week_data["appliedInactiveRealTotal"]
+    def __init__(self, week_data, scoring_period):
+        self.scoring_period = scoring_period
+        self.points = week_data["pointsByScoringPeriod"][str(scoring_period)]
         self.slots = []
-        for slot in week_data["slots"]:
-            if slot.get("player") is None:
+        for slot in week_data["rosterForCurrentScoringPeriod"]["entries"]:
+            if slot.get("playerId") is None:
                 continue
             self.slots.append(PlayerWeek(slot))
 
     def __repr__(self):
-        return "Week {} : {} : {} points, {} bench points".format(
-            self.week, self.team.owner, self.points, self.bench_points
-        )
+        return "Scoring Period {} : {} points".format(
+            self.scoring_period, self.points)
