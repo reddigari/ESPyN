@@ -89,7 +89,7 @@ class Matchup:
 
     @property
     def all_data(self):
-        if not self._boxscore_loaded:
+        if not self.boxscore_loaded:
             raise RuntimeError("Boxscore not loaded for this matchup.")
         return [self.home_data, self.away_data]
 
