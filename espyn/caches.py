@@ -52,7 +52,7 @@ class LocalCache(Cache):
 
 def cache_operation(func):
     def wrapped(*args):
-        cache = getattr(args[0], "cache")
+        cache = getattr(args[0], "cache", None)
         # if no cache, call the wrapped function as-is
         if cache is None:
             return func(*args)
