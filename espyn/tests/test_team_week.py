@@ -26,3 +26,8 @@ class PlayerTest(TestCase):
         self.assertEqual(len(tweek.slots), 16)
         self.assertIsInstance(tweek.slots[0], PlayerWeek)
 
+    def test_missing_player_id(self):
+        new_data = {**self.roster_data}
+        new_data["rosterForCurrentScoringPeriod"]["entries"][0]["playerId"] = None
+        tweek = TeamWeek(new_data, self.scoring_period)
+        self.assertEqual(len(tweek.slots), 15)
