@@ -7,9 +7,10 @@ verify_ssl = true
 ipython = "*"
 pytest = "*"
 pytest-cov = "*"
+coverage = "*"
 
 [packages]
-"espyn" = {path = ".", editable = true}
+espyn = {path = ".",editable = true}
 
 [requires]
 python_version = "3.7"
