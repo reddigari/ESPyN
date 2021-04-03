@@ -86,7 +86,7 @@ class League:
         """Teams composing the league.
 
         :return: list of teams in league
-        :rtype: list[Team]
+        :rtype: List[Team]
         """
         teams = list(self._teams.values())
         return sorted(teams, key=lambda i: i.team_id)
@@ -172,7 +172,7 @@ class League:
                          connection if data not cached)
         :type boxscore: bool
         :return: specified matchups
-        :rtype: list[Matchup]
+        :rtype: List[Matchup]
         """
         idx = set(self._matchup_dict[number].values())
         matchups = [self._matchups[i] for i in idx]
@@ -187,7 +187,7 @@ class League:
         :param include_playoffs: whether to include scores from playoff matchups
         :type include_playoffs: bool
         :return: list of team scores
-        :rtype: list[float]
+        :rtype: List[float]
         """
         scores = []
         cm = self.current_matchup_num()
@@ -216,7 +216,7 @@ class League:
         :param matchup_num: matchup number
         :type matchup_num: int
         :return: scoring period(s) composing matchup
-        :rtype: list[int]
+        :rtype: List[int]
         """
         num = str(matchup_num)
         return self._matchup_week_map.get(num)
@@ -240,7 +240,7 @@ class League:
         :param user_id: ESPN user ID
         :type user_id: str
         :return: member name
-        :rtype: str, optional
+        :rtype: Optional[str]
         """
         member = self._members.get(user_id)
         if member:
@@ -264,7 +264,7 @@ class League:
         """Get JSON-serializable dictionary representation
 
         :return: dictionary representation of league
-        :rtype: dict[str, Any]
+        :rtype: Dict[str, Any]
         """
         res = dict()
         res["league_id"] = self.league_id

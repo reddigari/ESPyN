@@ -64,7 +64,7 @@ class Matchup:
         """Home team's boxscore(s) if loaded
 
         :return: home team's boxscore(s) or None
-        :rtype: list[TeamWeek], optional
+        :rtype: Optional[List[TeamWeek]]
         """
         if not self.boxscore_loaded:
             return None
@@ -75,7 +75,7 @@ class Matchup:
         """Away team's boxscore(s) if loaded (and not bye)
 
         :return: away team's boxscore(s) or None
-        :rtype: list[TeamWeek], optional
+        :rtype: Optional[List[TeamWeek]]
         """
         if not self.boxscore_loaded or self.is_bye:
             return None
@@ -104,7 +104,7 @@ class Matchup:
         """Away team
 
         :return: away team, if not bye matchup
-        :rtype: Team, optional
+        :rtype: Optional[Team]
         """
         if self.away_team_id is not None:
             return self._league.get_team_by_id(self.away_team_id)
@@ -116,7 +116,7 @@ class Matchup:
         """Team IDs of matchup teams
 
         :return: team IDs
-        :rtype: list[int]
+        :rtype: List[int]
         """
         return [self.home_team_id, self.away_team_id]
 
@@ -140,7 +140,7 @@ class Matchup:
         """All boxscores in matchup
 
         :return: home and away boxscores
-        :rtype: list[list[TeamWeek]]
+        :rtype: List[Optional[List[TeamWeek]]]
 
         :raise: RuntimeError if boxscore data not yet loaded
         """
@@ -152,7 +152,7 @@ class Matchup:
         """Get JSON-serializable dictionary representation
 
         :return: dictionary representation of matchup
-        :rtype: dict[str, Any]
+        :rtype: Dict[str, Any]
         """
         res = dict()
         res["matchup_num"] = self.matchup_num
@@ -175,7 +175,7 @@ class Matchup:
         """Get scores from individual scoring periods for both teams
 
         :return: scores from all scoring periods
-        :rtype: list[float]
+        :rtype: List[float]
         """
         if self.is_bye:
             return []
