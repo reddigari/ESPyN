@@ -1,8 +1,8 @@
 import datetime
 from unittest import TestCase
 
-from ..utils import (_labor_day, current_season,
-                     get_week_from_date)
+from espyn.utils import (_labor_day, current_season,
+                         get_week_from_date)
 
 
 class UtilTests(TestCase):

@@ -2,8 +2,8 @@ import os
 import json
 from unittest import TestCase, mock
 
-from ..team import Team
-from ..constants import SEASON_OVER
+from espyn.team import Team
+from espyn.constants import SEASON_OVER
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")

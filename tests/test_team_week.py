@@ -2,8 +2,8 @@ import os
 import json
 from unittest import TestCase
 
-from ..team_week import TeamWeek
-from ..player_week import PlayerWeek
+from espyn.team_week import TeamWeek
+from espyn.player_week import PlayerWeek
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")

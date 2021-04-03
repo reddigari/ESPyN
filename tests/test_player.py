@@ -2,7 +2,7 @@ import os
 import json
 from unittest import TestCase
 
-from ..player import Player
+from espyn.player import Player
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")

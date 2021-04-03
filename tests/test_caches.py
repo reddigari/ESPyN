@@ -3,7 +3,7 @@ import json
 from unittest import TestCase, mock
 from tempfile import TemporaryDirectory
 
-from ..caches import Cache, LocalCache, cache_operation
+from espyn.caches import Cache, LocalCache, cache_operation
 
 
 class CacheTests(TestCase):

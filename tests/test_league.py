@@ -4,10 +4,10 @@ import urllib.request
 from io import BytesIO
 from unittest import TestCase, mock
 
-from ..league import League
-from ..team import Team
-from ..matchup import Matchup
-from ..caches import LocalCache
+from espyn.league import League
+from espyn.team import Team
+from espyn.matchup import Matchup
+from espyn.caches import LocalCache
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")

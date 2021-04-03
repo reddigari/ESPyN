@@ -2,8 +2,8 @@ import os
 import json
 from unittest import TestCase, mock
 
-from ..matchup import Matchup
-from ..team_week import TeamWeek
+from espyn.matchup import Matchup
+from espyn.team_week import TeamWeek
 
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
