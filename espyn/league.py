@@ -183,6 +183,7 @@ class League:
 
     def all_scores(self, include_playoffs: bool = True) -> List[float]:
         """Get list of scores for all matchups up to (and excluding) current week
+
         :param include_playoffs: whether to include scores from playoff matchups
         :type include_playoffs: bool
         :return: list of team scores
