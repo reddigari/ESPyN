@@ -1,9 +1,24 @@
+from typing import Any, Dict, List, TYPE_CHECKING
+
 from .constants import SEASON_OVER
+if TYPE_CHECKING:
+    from .league import League
+    from .matchup import Matchup
+    from .team_week import TeamWeek
 
 
 class Team:
+    """Representation of fantasy team"""
 
-    def __init__(self, team_data, league):
+    def __init__(self, team_data: Dict[str, Any],
+                 league: "League") -> None:
+        """Create team instance
+
+        :param team_data: data from API response
+        :type team_data: Dict[str, Any]
+        :param league: fantasy league to which team belongs
+        :type league: League
+        """
         self._league = league
         self.team_id = team_data["id"]
         self.team_abbrev = team_data["abbrev"]
@@ -31,17 +46,46 @@ class Team:
         )
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
+        """Full team name (location and nickname)
+
+        :return: full team name
+        :rtype: str
+        """
         return "{} {}".format(self.team_location, self.team_nickname)
 
     @property
-    def record(self):
+    def record(self) -> str:
+        """Team record (W-L-T)
+
+        :return: record
+        :rtype: str
+        """
         return "{}-{}-{}".format(self.wins, self.losses, self.ties)
 
-    def get_matchup_by_week(self, week, stats=False):
+    # TODO: rename method and params
+    def get_matchup_by_week(self, week: int,
+                            stats: bool = False) -> "Matchup":
+        """Get team's matchup by number
+
+        :param week: matchup number
+        :type week: int
+        :param stats: whether to load boxscore
+        :type stats: bool
+        :return: matchup for given scoring period
+        :rtype: Matchup
+        """
         return self._league.get_matchup(week, self.team_id, stats)
 
-    def get_data_by_week(self, week):
+    # TODO: rename method and params
+    def get_data_by_week(self, week: int) -> List[TeamWeek]:
+        """Get team's boxscore (player-level data) for matchup
+
+        :param week: matchup number
+        :type week: int
+        :return: boxscore data
+        :rtype: List[TeamWeek]
+        """
         # loads boxscore automatically
         m = self.get_matchup_by_week(week, True)
         if m.home_team_id == self.team_id:
@@ -49,7 +93,14 @@ class Team:
         else:
             return m.away_data
 
-    def scores(self, include_playoffs=True):
+    def scores(self, include_playoffs: bool = True) -> List[float]:
+        """Get scores from individual scoring periods
+
+        :param include_playoffs: include scores from playoff matchups
+        :type include_playoffs: bool
+        :return: team's scores
+        :rtype: List[float]
+        """
         scores = []
         cm = self._league.current_matchup_num()
         if cm == SEASON_OVER:
@@ -66,7 +117,12 @@ class Team:
                 scores.extend(m.away_scores)
         return scores
 
-    def to_json(self):
+    def to_json(self) -> Dict[str, Any]:
+        """Get JSON-serializable dictionary representation
+
+        :return: dictionary representation of team
+        :rtype: Dict[str, Any]
+        """
         res = dict()
         res["team_id"] = self.team_id
         res["team_abbrev"] = self.team_abbrev
