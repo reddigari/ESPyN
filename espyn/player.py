@@ -1,9 +1,17 @@
+from typing import Any, Dict
+
 from .constants import POSITIONS, PRO_TEAMS
 
 
 class Player:
+    """Representation of NFL player"""
 
-    def __init__(self, player_data):
+    def __init__(self, player_data: Dict[str, Any]) -> None:
+        """Create player instance
+
+        :param player_data: data from API response
+        :type player_data: Dict[str, Any]
+        """
         self.first_name = player_data["firstName"]
         self.last_name = player_data["lastName"]
         self.default_position_id = player_data["defaultPositionId"]
@@ -19,7 +27,12 @@ class Player:
             self.pro_team_during_match = None
 
     @property
-    def full_name(self):
+    def full_name(self) -> str:
+        """Player's full name
+
+        :return: player name
+        :rtype: str
+        """
         return "{} {}".format(self.first_name, self.last_name)
 
     def __repr__(self):
@@ -28,6 +41,11 @@ class Player:
         )
 
     def to_json(self):
+        """Get JSON-serializable dictionary representation
+
+        :return: dictionary representation of player
+        :rtype: Dict[str, Any]
+        """
         res = dict()
         res["first_name"] = self.first_name
         res["last_name"] = self.last_name
