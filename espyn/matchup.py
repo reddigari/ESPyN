@@ -14,6 +14,13 @@ class Matchup:
     """
     def __init__(self, matchup_data: Dict[str, Any],
                  league: "League") -> None:
+        """Create matchup instance
+
+        :param matchup_data: data from API response
+        :type matchup_data: Dict[str, Any]
+        :param league: fantasy league to which matchup belongs
+        :type league: League
+        """
         self._data = matchup_data
         self._league = league
         self.matchup_num = self._data["matchupPeriodId"]
