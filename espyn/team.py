@@ -78,7 +78,7 @@ class Team:
         return self._league.get_matchup(week, self.team_id, stats)
 
     # TODO: rename method and params
-    def get_data_by_week(self, week: int) -> List[TeamWeek]:
+    def get_data_by_week(self, week: int) -> List["TeamWeek"]:
         """Get team's boxscore (player-level data) for matchup
 
         :param week: matchup number
