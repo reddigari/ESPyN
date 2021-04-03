@@ -1,9 +1,19 @@
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
+
 from .team_week import TeamWeek
+if TYPE_CHECKING:
+    from .league import League
+    from .team import Team
 
 
 class Matchup:
+    """Representation of a fantasy matchup
 
-    def __init__(self, matchup_data, league):
+    Matchups may contain one or more scoring periods depending on the
+    league settings. A scoring period is one NFL week.
+    """
+    def __init__(self, matchup_data: Dict[str, Any],
+                 league: "League") -> None:
         self._data = matchup_data
         self._league = league
         self.matchup_num = self._data["matchupPeriodId"]
@@ -33,17 +43,33 @@ class Matchup:
         self.winner = self._data["winner"]
 
     @property
-    def boxscore_loaded(self):
+    def boxscore_loaded(self) -> bool:
+        """Whether boxscore (player-level) data have been loaded
+
+        Requires network request if data are not cached.
+        :return: whether boxscore is loaded
+        :rtype: bool
+        """
         return all(self._boxscore_loaded.values())
 
     @property
-    def home_data(self):
+    def home_data(self) -> Optional[List[TeamWeek]]:
+        """Home team's boxscore(s) if loaded
+
+        :return: home team's boxscore(s) or None
+        :rtype: list[TeamWeek], optional
+        """
         if not self.boxscore_loaded:
             return None
         return [self._boxscore_data["home"][i] for i in self.scoring_periods]
 
     @property
-    def away_data(self):
+    def away_data(self) -> Optional[List[TeamWeek]]:
+        """Away team's boxscore(s) if loaded (and not bye)
+
+        :return: away team's boxscore(s) or None
+        :rtype: list[TeamWeek], optional
+        """
         if not self.boxscore_loaded or self.is_bye:
             return None
         return [self._boxscore_data["away"][i] for i in self.scoring_periods]
@@ -58,18 +84,33 @@ class Matchup:
         self._boxscore_loaded[scoring_period] = True
 
     @property
-    def home_team(self):
+    def home_team(self) -> "Team":
+        """Home team
+
+        :return: home team
+        :rtype: Team
+        """
         return self._league.get_team_by_id(self.home_team_id)
 
     @property
-    def away_team(self):
+    def away_team(self) -> Optional["Team"]:
+        """Away team
+
+        :return: away team, if not bye matchup
+        :rtype: Team, optional
+        """
         if self.away_team_id is not None:
             return self._league.get_team_by_id(self.away_team_id)
         else:
             return None
 
     @property
-    def team_ids(self):
+    def team_ids(self) -> List[int]:
+        """Team IDs of matchup teams
+
+        :return: team IDs
+        :rtype: list[int]
+        """
         return [self.home_team_id, self.away_team_id]
 
     def __repr__(self):
@@ -88,12 +129,24 @@ class Matchup:
         return f"{prefix} : {away_exp} @ {home_exp}"
 
     @property
-    def all_data(self):
+    def all_data(self) -> List[Optional[List[TeamWeek]]]:
+        """All boxscores in matchup
+
+        :return: home and away boxscores
+        :rtype: list[list[TeamWeek]]
+
+        :raise: RuntimeError if boxscore data not yet loaded
+        """
         if not self.boxscore_loaded:
             raise RuntimeError("Boxscore not loaded for this matchup.")
         return [self.home_data, self.away_data]
 
-    def to_json(self):
+    def to_json(self) -> Dict[str, Any]:
+        """Get JSON-serializable dictionary representation
+
+        :return: dictionary representation of matchup
+        :rtype: dict[str, Any]
+        """
         res = dict()
         res["matchup_num"] = self.matchup_num
         res["team_ids"] = self.team_ids
@@ -111,7 +164,12 @@ class Matchup:
         res["away_data"] = None
         return res
 
-    def get_individual_scores(self):
+    def get_individual_scores(self) -> List[float]:
+        """Get scores from individual scoring periods for both teams
+
+        :return: scores from all scoring periods
+        :rtype: list[float]
+        """
         if self.is_bye:
             return []
         scores = []
