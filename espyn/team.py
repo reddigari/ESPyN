@@ -1,4 +1,3 @@
-from .utils import current_week
 from .constants import SEASON_OVER
 
 
