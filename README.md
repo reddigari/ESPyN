@@ -90,8 +90,8 @@ D/ST : Vikings D/ST, D/ST, MIN : -9.0 points
 Note that `Matchup.home_data` is a list; many ESPN leagues use multi-week
 matchups during the playoffs. In this case, the list will contain
 multiple `TeamWeek` instances. ESPN refers to each NFL week as a "scoring period."
-A matchup contains one or more scoring periods. Use the `League.matchup_num_to_week()`
-method to inspect the mapping.
+A matchup contains one or more scoring periods. Use the
+`League.matchup_num_to_scoring_periods()` method to inspect the mapping.
 
 
 ## Caching

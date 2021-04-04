@@ -122,7 +122,7 @@ class League:
         return data
 
     def _populate_boxscores(self, matchup_num):
-        scoring_periods = self.matchup_num_to_week(matchup_num)
+        scoring_periods = self.matchup_num_to_scoring_periods(matchup_num)
         if scoring_periods is None:
             raise ValueError(
                 "This league does not have a matchup number %d." % matchup_num)
@@ -210,7 +210,7 @@ class League:
         scores = self.all_scores(include_playoffs)
         return float(sum(scores)) / len(scores)
 
-    def matchup_num_to_week(self, matchup_num: int) -> List[int]:
+    def matchup_num_to_scoring_periods(self, matchup_num: int) -> List[int]:
         """Get scoring periods corresponding to a matchup number
 
         :param matchup_num: matchup number

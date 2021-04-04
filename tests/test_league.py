@@ -44,8 +44,8 @@ class LeagueTests(TestCase):
         cache = self.get_mock_cache()
         league = League(1603206, season=2020, cache=cache)
         # matchup period mapping
-        self.assertEqual(league.matchup_num_to_week(1), [1])
-        self.assertEqual(set(league.matchup_num_to_week(14)), {15, 16})
+        self.assertEqual(league.matchup_num_to_scoring_periods(1), [1])
+        self.assertEqual(set(league.matchup_num_to_scoring_periods(14)), {15, 16})
         self.assertEqual(league.week_to_matchup_num(16), 14)
         team = league.get_team_by_id(7)
         self.assertIsInstance(team, Team)

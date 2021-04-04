@@ -15,7 +15,7 @@ class MatchupTests(TestCase):
     @staticmethod
     def get_mock_league(**kwargs):
         league = mock.Mock()
-        league.matchup_num_to_week.return_value = [10]
+        league.matchup_num_to_scoring_periods.return_value = [10]
         league.reg_season_weeks = 12
         league.get_team_by_id.return_value = mock.Mock(full_name="Mock Team")
         league.configure_mock(**kwargs)

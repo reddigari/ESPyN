@@ -24,7 +24,8 @@ class Matchup:
         self._data = matchup_data
         self._league = league
         self.matchup_num = self._data["matchupPeriodId"]
-        self.scoring_periods = league.matchup_num_to_week(self.matchup_num)
+        self.scoring_periods = league.matchup_num_to_scoring_periods(
+            self.matchup_num)
         self._boxscore_data = {
             "home": {i: None for i in self.scoring_periods},
             "away": {i: None for i in self.scoring_periods},
