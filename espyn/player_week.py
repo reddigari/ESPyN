@@ -5,14 +5,13 @@ from .constants import SLOTS, STAT_CODES
 
 
 class PlayerWeek:
-    """Representation of player stat line for one NFL week"""
+    """Representation of player stat line for one NFL week
+
+    :param stat_data: data from API response
+    :type stat_data: Dict[str, Any]
+    """
 
     def __init__(self, stat_data: Dict[str, Any]) -> None:
-        """Create player-week instance
-
-        :param stat_data: data from API response
-        :type stat_data: Dict[str, Any]
-        """
         ppe = stat_data["playerPoolEntry"]
         self.player = Player(ppe["player"])
         self.slot_id = stat_data["lineupSlotId"]

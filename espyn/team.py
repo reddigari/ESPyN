@@ -8,17 +8,16 @@ if TYPE_CHECKING:
 
 
 class Team:
-    """Representation of fantasy team"""
+    """Representation of fantasy team
+
+    :param team_data: data from API response
+    :type team_data: Dict[str, Any]
+    :param league: fantasy league to which team belongs
+    :type league: League
+    """
 
     def __init__(self, team_data: Dict[str, Any],
                  league: "League") -> None:
-        """Create team instance
-
-        :param team_data: data from API response
-        :type team_data: Dict[str, Any]
-        :param league: fantasy league to which team belongs
-        :type league: League
-        """
         self._league = league
         self.team_id = team_data["id"]
         self.team_abbrev = team_data["abbrev"]

@@ -11,7 +11,18 @@ from .caches import Cache, cache_operation
 
 
 class League:
-    """Representation of an ESPN fantasy football league"""
+    """Representation of an ESPN fantasy football league
+
+    Retrieve and model a league for a given season. Makes API
+    request unless given cache contains league data.
+
+    :param league_id: ID of ESPN league
+    :type league_id: int
+    :param season: NFL season
+    :type season: Optional[int]
+    :param cache: cache to reduce network requests
+    :type cache: Optional[Cache]
+    """
 
     @staticmethod
     def _request_json(url):
@@ -24,15 +35,6 @@ class League:
 
     def __init__(self, league_id: int, season: Optional[int] = None,
                  cache: Optional[Cache] = None) -> None:
-        """Retrieve and model a league for a given season.
-
-        :param league_id: ID of ESPN league
-        :type league_id: int
-        :param season: NFL season
-        :type season: int, optional
-        :param cache: cache to reduce network requests
-        :type cache: espyn.cache.Cache, optional
-        """
         if cache:
             self.cache = cache
             self.cache.set_league(self)
