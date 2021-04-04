@@ -2,7 +2,14 @@ import math
 from datetime import datetime, timedelta
 
 
-def current_season():
+def current_season() -> int:
+    """Get current NFL season
+
+     After March, returns year of upcoming season.
+
+    :return: current NFL season
+    :rtype: int
+    """
     now = datetime.now()
     month, year = now.month, now.year
     if month < 4:
@@ -23,7 +30,18 @@ def _labor_day(year):
     return day
 
 
-def get_week_from_date(date):
+def get_week_from_date(date) -> int:
+    """Get NFL week (ESPN scoring period) from date
+
+    The year of the given date determines the relevant NFL season.
+    Assumes week 1 begins the week of Labor Day and ends the following
+    Wednesday. Does not cap value, so may be below 1 or above 17.
+
+    :param date: date for which to determine NFL week
+    :rtype: datetime
+    :return: NFL week (ESPN scoring period)
+    :rtype: int
+    """
     month, year = date.month, date.year
     if month < 4:
         year -= 1
@@ -35,6 +53,11 @@ def get_week_from_date(date):
     return int(week)
 
 
-def current_week():
+def current_week() -> int:
+    """Get current NFL week (ESPN scoring period)
+
+    :return: current NFL week (ESPN scoring period)
+    :rtype: int
+    """
     now = datetime.now()
     return get_week_from_date(now)
