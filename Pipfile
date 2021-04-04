@@ -8,6 +8,7 @@ ipython = "*"
 pytest = "*"
 pytest-cov = "*"
 coverage = "*"
+sphinx = "*"
 
 [packages]
 espyn = {path = ".",editable = true}
