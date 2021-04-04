@@ -46,7 +46,7 @@ class LeagueTests(TestCase):
         # matchup period mapping
         self.assertEqual(league.matchup_num_to_scoring_periods(1), [1])
         self.assertEqual(set(league.matchup_num_to_scoring_periods(14)), {15, 16})
-        self.assertEqual(league.week_to_matchup_num(16), 14)
+        self.assertEqual(league.scoring_period_to_matchup_num(16), 14)
         team = league.get_team_by_id(7)
         self.assertIsInstance(team, Team)
         self.assertEqual(team.team_id, 7)

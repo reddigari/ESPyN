@@ -221,16 +221,18 @@ class League:
         num = str(matchup_num)
         return self._matchup_week_map.get(num)
 
-    def week_to_matchup_num(self, week: int) -> int:
+    def scoring_period_to_matchup_num(self, scoring_period: int) -> Optional[int]:
         """Get matchup number corresponding to a scoring period
 
-        :param week: scoring period
-        :type week: int
+        Returns None if scoring period is not part of any matchup
+
+        :param scoring_period: scoring period
+        :type scoring_period: int
         :return: matchup number
-        :rtype: int
+        :rtype: Optional[int]
         """
-        for m, wks in self._matchup_week_map.items():
-            if week in wks:
+        for m, sps in self._matchup_week_map.items():
+            if scoring_period in sps:
                 return int(m)
         return None
 
@@ -254,7 +256,7 @@ class League:
         :rtype: int
         """
         cw = current_week()
-        mn = self.week_to_matchup_num(cw)
+        mn = self.scoring_period_to_matchup_num(cw)
         if mn is not None:
             return mn
         else:
