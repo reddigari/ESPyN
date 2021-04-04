@@ -1,10 +1,18 @@
+from typing import Any, Dict
+
 from .player import Player
 from .constants import SLOTS, STAT_CODES
 
 
 class PlayerWeek:
+    """Representation of player stat line for one NFL week"""
 
-    def __init__(self, stat_data):
+    def __init__(self, stat_data: Dict[str, Any]) -> None:
+        """Create player-week instance
+
+        :param stat_data: data from API response
+        :type stat_data: Dict[str, Any]
+        """
         ppe = stat_data["playerPoolEntry"]
         self.player = Player(ppe["player"])
         self.slot_id = stat_data["lineupSlotId"]
@@ -32,7 +40,15 @@ class PlayerWeek:
         )
 
     @property
-    def stat_line(self):
+    def stat_line(self) -> Dict[str, float]:
+        """Get statistic-value mapping
+
+        Current implementation excludes stats if the library
+        doesn't recognize the code; see `constants.py`
+
+        :return: stat line keyed on statistic names
+        :rtype: Dict[str, float]
+        """
         stats = {}
         for code, val in self._coded_stats.items():
             stat = STAT_CODES.get(code)
@@ -41,17 +57,24 @@ class PlayerWeek:
         return stats
 
     @property
-    def projection_error(self):
+    def projection_error(self) -> float:
+        """Difference between projection and actual score
+
+        :return: projection error, positive if projection too high
+        :rtype: float
+        """
         try:
             return self.projected_points - self.points
         except TypeError:  # sometimes one or both values is None
             return None
 
-    def calculate_points(self, score_values):
-        """
-        Manually calculates points from score code to fantasy points mapping
-        :param score_values: dict with code keys and point values
+    def calculate_points(self, score_values: Dict[int, float]) -> float:
+        """Manually calculate points from code to points mapping
+
+        :param score_values: code to point-value mapping
+        :type score_values: Dict[int, float]
         :return: player's fantasy points according to mapping
+        :rtype: float
         """
         total = 0
         for code, val in self._coded_stats.items():
@@ -59,7 +82,12 @@ class PlayerWeek:
                 total += score_values[code] * val
         return round(total, 2)
 
-    def to_json(self):
+    def to_json(self) -> Dict[str, Any]:
+        """Get JSON-serializable dictionary representation
+
+        :return: dictionary representation of player-week
+        :rtype: Dict[str, Any]
+        """
         res = dict()
         res["player"] = self.player.to_json()
         res["slot"] = self.slot

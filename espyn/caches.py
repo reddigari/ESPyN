@@ -1,16 +1,45 @@
 import os
 import json
 import logging
+from typing import Any, Callable, Optional, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .league import League
 
 
 class Cache:
-    def set_league(self, league):
+    """Abstract base class for caches"""
+
+    def set_league(self, league: "League") -> None:
+        """Set league to be used with cache
+
+        :param league: league whose data will be cached
+        :type league: League
+        """
         self.league = league
 
-    def load(self, scoring_period=None):
+    def load(self, scoring_period: Optional[int] = None) -> Any:
+        """Load data from cache
+
+        If `scoring_period` is given, the API response containing
+        that period's boxscores will be loaded.
+
+        :param scoring_period: scoring period to load (optional)
+        :type scoring_period: Optional[int]
+        :return: JSON-deserialized cache entry
+        :rtype: Any
+        """
         raise NotImplementedError()
 
-    def save(self, data, scoring_period=None):
+    def save(self, data: Any,
+             scoring_period: Optional[int] = None) -> None:
+        """Save data to cache
+
+        :param data: JSON-serializable data to cache
+        :type data: Any
+        :param scoring_period: scoring period of boxscores in data
+        :type scoring_period: Optional[int]
+        """
         raise NotImplementedError()
 
     def _get_filename(self, scoring_period=None):
@@ -22,6 +51,7 @@ class Cache:
 
 
 class LocalCache(Cache):
+    """Concrete `Cache` implementation to read/write local JSON files"""
 
     def __init__(self, cache_dir, ignore_cache=False):
         if not os.path.exists(cache_dir):
@@ -50,7 +80,25 @@ class LocalCache(Cache):
         logging.info(f"Wrote file {fname} to local cache.")
 
 
-def cache_operation(func):
+def cache_operation(func: Callable) -> Callable:
+    """Wrap a `League` method in cache load/save attempts
+
+    Decorated methods will first pass their parameters to the `load`
+    method of the `League`'s `Cache` instance. If the cache hits,
+    the data are returned. Otherwise the decorated method is called,
+    and the retrieved data are passed to the `Cache`'s `save` method
+    with the parameters of the original call.
+
+    The first parameter of the decorated method is expected to have
+    a `cache` attribute (typically the `League` instance).
+    The decorator is dependent on the `load` and `save` methods
+    expecting the same parameters as the decorated functions.
+
+    :param func: function/method to decorate
+    :type func: Callable
+    :return: decorated function/method
+    :rtype: Callable
+    """
     def wrapped(*args):
         cache = getattr(args[0], "cache", None)
         # if no cache, call the wrapped function as-is

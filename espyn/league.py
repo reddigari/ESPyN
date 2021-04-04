@@ -1,15 +1,17 @@
 import urllib.request
 import logging
 import json
+from typing import Optional, List, Dict, Any
 
 from .constants import ENDPOINT, SEASON_OVER
 from .team import Team
 from .matchup import Matchup
 from .utils import *
-from .caches import cache_operation
+from .caches import Cache, cache_operation
 
 
 class League:
+    """Representation of an ESPN fantasy football league"""
 
     @staticmethod
     def _request_json(url):
@@ -20,7 +22,17 @@ class League:
         except urllib.request.URLError:
             return None
 
-    def __init__(self, league_id, season=None, cache=None):
+    def __init__(self, league_id: int, season: Optional[int] = None,
+                 cache: Optional[Cache] = None) -> None:
+        """Retrieve and model a league for a given season.
+
+        :param league_id: ID of ESPN league
+        :type league_id: int
+        :param season: NFL season
+        :type season: int, optional
+        :param cache: cache to reduce network requests
+        :type cache: espyn.cache.Cache, optional
+        """
         if cache:
             self.cache = cache
             self.cache.set_league(self)
@@ -70,19 +82,22 @@ class League:
         )
 
     @property
-    def teams(self):
-        """
-        Teams composing the league.
-        :return: List of Team objects representing league's teams
+    def teams(self) -> List[Team]:
+        """Teams composing the league.
+
+        :return: list of teams in league
+        :rtype: List[Team]
         """
         teams = list(self._teams.values())
         return sorted(teams, key=lambda i: i.team_id)
 
-    def get_team_by_id(self, team_id):
-        """
-        Returns team with given ID
-        :param team_id: integer team ID
-        :return: team with given ID
+    def get_team_by_id(self, team_id: int) -> Team:
+        """Get team with given team ID
+
+        :param team_id: team ID
+        :type team_id: int
+        :return: :class:`Team` with given ID
+        :rtype: Team
         """
         return self._teams[team_id]
 
@@ -127,14 +142,19 @@ class League:
         except KeyError:
             return None
 
-    def get_matchup(self, number, team_id, boxscore=False):
-        """
-        Returns matchup from specified week involving specified team.
+    def get_matchup(self, number: int, team_id: int,
+                    boxscore: bool = False) -> Matchup:
+        """Get matchup by matchup number and team ID
+
         :param number: matchup number (usually a week number during reg season)
-        :param team_id: integer team ID
+        :type number: int
+        :param team_id: team ID
+        :type team_id: int
         :param boxscore: whether to load boxscore (will require Internet
                          connection if data not cached)
+        :type boxscore: bool
         :return: specified matchup
+        :rtype: Matchup
         """
         matchup = self._lookup_matchup(number, team_id)
         if boxscore:
@@ -142,13 +162,17 @@ class League:
                 self._populate_boxscores(number)
         return matchup
 
-    def get_matchups_by_number(self, number, boxscore=False):
-        """
-        Returns all matchups from specified week/number
-        :param number: week/matchup number
+    def get_matchups_by_number(self, number: int,
+                               boxscore: bool = False) -> List[Matchup]:
+        """Get all matchups from matchup number
+
+        :param number: matchup number (usually a week number during reg season)
+        :type number: int
         :param boxscore: whether to load boxscore (will require Internet
                          connection if data not cached)
-        :return:  list of specified matchups
+        :type boxscore: bool
+        :return: specified matchups
+        :rtype: List[Matchup]
         """
         idx = set(self._matchup_dict[number].values())
         matchups = [self._matchups[i] for i in idx]
@@ -157,11 +181,13 @@ class League:
                 self._populate_boxscores(number)
         return matchups
 
-    def all_scores(self, include_playoffs=True):
-        """
-        Returns list of scores for all matchups up to (and excluding) current week
+    def all_scores(self, include_playoffs: bool = True) -> List[float]:
+        """Get list of scores for all matchups up to (and excluding) current week
+
         :param include_playoffs: whether to include scores from playoff matchups
+        :type include_playoffs: bool
         :return: list of team scores
+        :rtype: List[float]
         """
         scores = []
         cm = self.current_matchup_num()
@@ -173,27 +199,60 @@ class League:
             scores.extend(m.get_individual_scores())
         return scores
 
-    def average_score(self, include_playoffs=True):
+    def average_score(self, include_playoffs: bool = True) -> float:
+        """Get league's average score (per scoring period)
+
+        :param include_playoffs: whether to include scores from playoff matchups
+        :type include_playoffs: bool
+        :return: average score
+        :rtype: float
+        """
         scores = self.all_scores(include_playoffs)
         return float(sum(scores)) / len(scores)
 
-    def matchup_num_to_week(self, matchup_num):
+    def matchup_num_to_week(self, matchup_num: int) -> List[int]:
+        """Get scoring periods corresponding to a matchup number
+
+        :param matchup_num: matchup number
+        :type matchup_num: int
+        :return: scoring period(s) composing matchup
+        :rtype: List[int]
+        """
         num = str(matchup_num)
         return self._matchup_week_map.get(num)
 
-    def week_to_matchup_num(self, week):
+    def week_to_matchup_num(self, week: int) -> int:
+        """Get matchup number corresponding to a scoring period
+
+        :param week: scoring period
+        :type week: int
+        :return: matchup number
+        :rtype: int
+        """
         for m, wks in self._matchup_week_map.items():
             if week in wks:
                 return int(m)
         return None
 
-    def name_from_user_id(self, user_id):
+    def name_from_user_id(self, user_id: str) -> Optional[str]:
+        """Get member name from ESPN user ID
+
+        :param user_id: ESPN user ID
+        :type user_id: str
+        :return: member name
+        :rtype: Optional[str]
+        """
         member = self._members.get(user_id)
         if member:
             return f"{member['firstName']} {member['lastName']}"
         return None
 
-    def current_matchup_num(self):
+    def current_matchup_num(self) -> int:
+        """Get current matchup number
+
+        :return: matchup number
+        :rtype: int
+        """
         cw = current_week()
         mn = self.week_to_matchup_num(cw)
         if mn is not None:
@@ -201,7 +260,12 @@ class League:
         else:
             return SEASON_OVER
 
-    def to_json(self):
+    def to_json(self) -> Dict[str, Any]:
+        """Get JSON-serializable dictionary representation
+
+        :return: dictionary representation of league
+        :rtype: Dict[str, Any]
+        """
         res = dict()
         res["league_id"] = self.league_id
         res["league_name"] = self.name
