@@ -42,14 +42,14 @@ class TeamTests(TestCase):
     def test_team_methods(self):
         league = self.get_mock_league()
         team = Team(self.team_data, league)
-        _ = team.get_matchup_by_week(1)
+        _ = team.get_matchup(1)
         league.get_matchup.assert_called_with(1, 1, False)
-        _ = team.get_data_by_week(7)
+        _ = team.get_data_by_matchup(7)
         league.get_matchup.assert_called_with(7, 1, True)
         # make sure home/away branching is covered
         league.get_matchup.return_value = mock.Mock(
             home_team_id=team.team_id, home_data=22)
-        data = team.get_data_by_week(7)
+        data = team.get_data_by_matchup(7)
         self.assertIs(data, 22)
 
     def test_team_scores(self):

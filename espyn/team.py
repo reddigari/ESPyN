@@ -63,31 +63,29 @@ class Team:
         """
         return "{}-{}-{}".format(self.wins, self.losses, self.ties)
 
-    # TODO: rename method and params
-    def get_matchup_by_week(self, week: int,
-                            stats: bool = False) -> "Matchup":
+    def get_matchup(self, number: int,
+                    boxscore: bool = False) -> "Matchup":
         """Get team's matchup by number
 
-        :param week: matchup number
-        :type week: int
-        :param stats: whether to load boxscore
-        :type stats: bool
+        :param number: matchup number
+        :type number: int
+        :param boxscore: whether to load boxscore
+        :type boxscore: bool
         :return: matchup for given scoring period
         :rtype: Matchup
         """
-        return self._league.get_matchup(week, self.team_id, stats)
+        return self._league.get_matchup(number, self.team_id, boxscore)
 
-    # TODO: rename method and params
-    def get_data_by_week(self, week: int) -> List["TeamWeek"]:
+    def get_data_by_matchup(self, number: int) -> List["TeamWeek"]:
         """Get team's boxscore (player-level data) for matchup
 
-        :param week: matchup number
+        :param number: matchup number
         :type week: int
         :return: boxscore data
         :rtype: List[TeamWeek]
         """
         # loads boxscore automatically
-        m = self.get_matchup_by_week(week, True)
+        m = self.get_matchup(number, True)
         if m.home_team_id == self.team_id:
             return m.home_data
         else:
@@ -105,8 +103,8 @@ class Team:
         cm = self._league.current_matchup_num()
         if cm == SEASON_OVER:
             cm = self._league.total_matchups + 1
-        for w in range(1, cm):  # excludes matchup in progress
-            m = self.get_matchup_by_week(w)
+        for m_num in range(1, cm):  # excludes matchup in progress
+            m = self.get_matchup(m_num)
             if m is None or m.is_bye:
                 continue
             if (not include_playoffs) and m.is_playoff:
