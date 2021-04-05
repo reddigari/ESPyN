@@ -9,12 +9,21 @@ ESPyN
    :target: https://reddigari-github-badges.s3.amazonaws.com/espyn-coverage-develop.svg
    :alt: coverage
 
+.. image:: https://readthedocs.org/projects/espyn-api/badge/?version=latest
+   :target: https://espyn-api.readthedocs.io/
+   :alt: Documentation
+
 ----
+
+Documentation_
 
 This library uses the (private and wholly undocumented) ESPN Fantasy Football
 API to retrieve data about **public** leagues. It includes object models of
 leagues, teams, players, and stat lines (at the player-week and team-week
 levels).
+
+.. _Documentation: https://espyn-api.readthedocs.io/
+
 
 Basic Usage
 -----------
