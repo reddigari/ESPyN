@@ -99,6 +99,6 @@ Caching the responses is recommended:
    cache = LocalCache("/path/to/cache/directory")
    league = League(<LEAGUE_ID>, <SEASON>, cache)
 
-The respones from all API calls will be cached as JSON files in the specifcied
+The responses from all API calls will be cached as JSON files in the specified
 directory, and neither the constructor nor methods with ``boxscore=True`` will
 make network requests if the necessary file is in the cache.
