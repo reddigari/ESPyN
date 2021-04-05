@@ -10,7 +10,8 @@ Welcome to espyn's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   espyn
+   getting_started
+   reference
 
 
 
