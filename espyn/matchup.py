@@ -122,7 +122,9 @@ class Matchup:
 
     def __repr__(self):
         WINNER_SYM = chr(0x2705)
-        prog = " (in progress)" if self.winner == "UNDECIDED" else ""
+        prog = ""
+        if self.winner == "UNDECIDED" and not self.is_bye:
+            prog = " (in progress)"
         prefix = f"Matchup #{self.matchup_num}{prog}"
         home_exp = "{} ({})".format(
             self.home_team.full_name, self.home_score)
