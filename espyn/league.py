@@ -29,7 +29,7 @@ class League:
         try:
             res = urllib.request.urlopen(url)
             raw = res.read()
-            return json.loads(raw.decode("windows-1252"))
+            return json.loads(raw.decode())
         except urllib.request.URLError:
             return None
 
