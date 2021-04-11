@@ -61,7 +61,11 @@ class Matchup:
         return all(self._boxscore_loaded.values())
 
     @property
-    def error(self):
+    def error(self) -> Optional[str]:
+        """Description of errors encountered setting boxscore data
+
+        :return: Optional[str]
+        """
         if len(self._errors):
             return " ".join(self._errors)
         return None
