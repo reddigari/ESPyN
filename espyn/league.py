@@ -79,8 +79,8 @@ class League:
                 tmp[team_id] = i
 
     def __repr__(self):
-        return "ESPN League {} - {} - {} teams".format(
-            self.league_id, self.name, self.size
+        return "ESPN League {} ({}) - {} - {} teams".format(
+            self.league_id, self.season, self.name, self.size
         )
 
     @property

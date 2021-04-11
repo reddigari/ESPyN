@@ -37,7 +37,7 @@ class LeagueTests(TestCase):
         self.assertEqual(league.total_matchups, 14)
         self.assertEqual(league.scoring_dict[42], 0.1)
         self.assertIsInstance(league.teams[0], Team)
-        for phrase in ("League", "1603206", "The Ocho, Dos", "10"):
+        for phrase in ("League", "1603206", "2020", "The Ocho, Dos", "10"):
             self.assertIn(phrase, str(league))
 
     def test_league_methods(self):
