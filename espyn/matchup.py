@@ -55,6 +55,7 @@ class Matchup:
         """Whether boxscore (player-level) data have been loaded
 
         Requires network request if data are not cached.
+
         :return: whether boxscore is loaded
         :rtype: bool
         """
