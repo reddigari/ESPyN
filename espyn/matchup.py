@@ -30,6 +30,7 @@ class Matchup:
             "away": {i: None for i in self.scoring_periods},
         }
         self._boxscore_loaded = {i: False for i in self.scoring_periods}
+        self._errors = set()
         self.is_playoff = self.matchup_num > league.reg_season_weeks
         self.is_bye = False  # change upon inspection of data
         self.num_weeks = len(self.scoring_periods)
@@ -60,6 +61,10 @@ class Matchup:
         return all(self._boxscore_loaded.values())
 
     @property
+    def error(self):
+        return " ".join(self._errors)
+
+    @property
     def home_data(self) -> Optional[List[TeamWeek]]:
         """Home team's boxscore(s) if loaded
 
@@ -81,8 +86,19 @@ class Matchup:
             return None
         return [self._boxscore_data["away"][i] for i in self.scoring_periods]
 
+    def _validate_boxscore_data(self, data, scoring_period):
+        if "rosterForCurrentScoringPeriod" not in data["home"]:
+            self._errors.add(
+                f"Boxscore missing home team data for period {scoring_period}.")
+        if not self.is_bye and "rosterForCurrentScoringPeriod" not in data["away"]:
+            self._errors.add(
+                f"Boxscore missing away team data for period {scoring_period}.")
+        return
+
     def set_boxscore_data(self, data, scoring_period):
-        assert "rosterForCurrentScoringPeriod" in data["home"]
+        self._validate_boxscore_data(data, scoring_period)
+        if self.error:
+            return
         self._boxscore_data["home"][scoring_period] = TeamWeek(
             data["home"], scoring_period)
         if not self.is_bye:
