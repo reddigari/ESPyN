@@ -70,6 +70,15 @@ class MatchupTests(TestCase):
         self.assertIn("BYE", str(matchup))
         self.assertEqual(len(matchup.get_individual_scores()), 0)
 
+    def test_matchup_missing_data(self):
+        new_data = {**self.matchup_data}
+        del new_data["home"]["rosterForCurrentScoringPeriod"]
+        del new_data["away"]["rosterForCurrentScoringPeriod"]
+        matchup = Matchup(new_data, self.mock_league)
+        matchup.set_boxscore_data(new_data, 10)
+        self.assertNotEqual(matchup.error, "")
+        self.assertFalse(matchup.boxscore_loaded)
+
     def test_matchup_json(self):
         matchup = Matchup(self.matchup_data, self.mock_league)
         data = matchup.to_json()
