@@ -1,17 +1,33 @@
 ESPyN
 =====
 
-.. image:: https://github.com/reddigari/ESPyN/actions/workflows/ci.yml/badge.svg
-   :target: https://github.com/reddigari/ESPyN/actions
-   :alt: ci status
+.. |ci-master| image:: https://github.com/reddigari/ESPyN/actions/workflows/ci.yml/badge.svg?branch=master
+   :target: https://github.com/reddigari/ESPyN/actions?query=branch%3Amaster
+   :alt: CI status (master)
 
-.. image:: https://reddigari-github-badges.s3.amazonaws.com/espyn-coverage-develop.svg
-   :target: https://reddigari-github-badges.s3.amazonaws.com/espyn-coverage-develop.svg
-   :alt: coverage
+.. |ci-develop| image:: https://github.com/reddigari/ESPyN/actions/workflows/ci.yml/badge.svg?branch=develop
+   :target: https://github.com/reddigari/ESPyN/actions?query=branch%3Adevelop
+   :alt: CI status (develop)
 
-.. image:: https://readthedocs.org/projects/espyn-api/badge/?version=latest
-   :target: https://espyn-api.readthedocs.io/
-   :alt: Documentation
+.. |cov-master| image:: https://reddigari-github-badges.s3.amazonaws.com/espyn-coverage-master.svg
+   :alt: Coverage (master)
+
+.. |cov-develop| image:: https://reddigari-github-badges.s3.amazonaws.com/espyn-coverage-develop.svg
+   :alt: Coverage (develop)
+
+.. |docs-stable| image:: https://readthedocs.org/projects/espyn-api/badge/?version=stable
+   :target: https://espyn-api.readthedocs.io/en/stable/
+   :alt: Documentation (stable)
+
+.. |docs-latest| image:: https://readthedocs.org/projects/espyn-api/badge/?version=latest
+   :target: https://espyn-api.readthedocs.io/en/latest/
+   :alt: Documentation (latest)
+
++-------------+--------------+---------------+---------------+
+| ``master``  + |ci-master|  + |cov-master|  + |docs-stable| |
++-------------+--------------+---------------+---------------+
+| ``develop`` + |ci-develop| + |cov-develop| + |docs-latest| |
++-------------+--------------+---------------+---------------+
 
 ----
 
