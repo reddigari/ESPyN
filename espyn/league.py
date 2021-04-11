@@ -135,7 +135,8 @@ class League:
             # by home team ID, and set the boxscore data
             for datum in data:
                 m = self.get_matchup(matchup_num, datum["home"]["teamId"])
-                m.set_boxscore_data(datum, sp)
+                if not m.boxscore_loaded:
+                    m.set_boxscore_data(datum, sp)
 
     def _lookup_matchup(self, matchup_num, team_id):
         try:
