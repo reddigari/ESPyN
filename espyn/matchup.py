@@ -62,7 +62,9 @@ class Matchup:
 
     @property
     def error(self):
-        return " ".join(self._errors)
+        if len(self._errors):
+            return " ".join(self._errors)
+        return None
 
     @property
     def home_data(self) -> Optional[List[TeamWeek]]:

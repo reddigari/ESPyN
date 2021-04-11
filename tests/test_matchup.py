@@ -58,6 +58,7 @@ class MatchupTests(TestCase):
         self.assertIsInstance(matchup.home_data[0], TeamWeek)
         self.assertIsInstance(matchup.away_data[0], TeamWeek)
         self.assertEqual(len(matchup.all_data), 2)
+        self.assertIsNone(matchup.error)
 
     def test_bye_matchup(self):
         new_data = {**self.matchup_data}
