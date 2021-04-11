@@ -65,7 +65,8 @@ class Matchup:
     def error(self) -> Optional[str]:
         """Description of errors encountered setting boxscore data
 
-        :return: Optional[str]
+        :return: errors encountered setting boxscore data
+        :rtype: Optional[str]
         """
         if len(self._errors):
             return " ".join(self._errors)
