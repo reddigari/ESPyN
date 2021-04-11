@@ -1,0 +1,47 @@
+name: ci
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pipenv install --dev
+
+    - name: Run unit tests
+      run: pipenv run pytest
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Publish coverage badge
+      run: |
+          SUMMARY=$(pipenv run coverage report | tail -1)
+          COV=$(echo $SUMMARY| awk '{print $NF}' | cut -d'%' -f1)
+
+          if [ $COV -gt 90 ]; then COLOR=brightgreen;
+          elif [ $COV -gt 80 ]; then COLOR=green
+          elif [ $COV -gt 50 ]; then COLOR=orange
+          else COLOR=red
+          fi
+
+          BRANCH=${GITHUB_REF##*/}
+          curl -s "https://img.shields.io/badge/coverage-$COV%25-$COLOR" > badge.svg
+          aws s3 cp badge.svg "s3://reddigari-github-badges/espyn-coverage-$BRANCH.svg" \
+              --cache-control no-cache

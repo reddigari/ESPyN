@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+pytest = "*"
+pytest-cov = "*"
+coverage = "*"
+sphinx = "*"
+sphinx-rtd-theme = "*"
+setuptools-scm = "*"
+
+[packages]
+espyn = {editable = true, path = "."}
+
+[requires]
+python_version = "3.7"
