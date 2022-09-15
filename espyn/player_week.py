@@ -1,7 +1,8 @@
 from typing import Any, Dict
 
 from .player import Player
-from .constants import SLOTS, STAT_CODES
+from .stat_line import StatLine
+from .constants import SLOTS
 
 
 class PlayerWeek:
@@ -10,6 +11,8 @@ class PlayerWeek:
     :param stat_data: data from API response
     :type stat_data: Dict[str, Any]
     """
+    stat_line = StatLine("_coded_stats")
+    proj_line = StatLine("_coded_proj")
 
     def __init__(self, stat_data: Dict[str, Any]) -> None:
         ppe = stat_data["playerPoolEntry"]
@@ -43,23 +46,6 @@ class PlayerWeek:
         return "{} : {} : {}".format(
             self.slot, self.player, pts_str
         )
-
-    @property
-    def stat_line(self) -> Dict[str, float]:
-        """Get statistic-value mapping
-
-        Current implementation excludes stats if the library
-        doesn't recognize the code; see `constants.py`
-
-        :return: stat line keyed on statistic names
-        :rtype: Dict[str, float]
-        """
-        stats = {}
-        for code, val in self._coded_stats.items():
-            stat = STAT_CODES.get(code)
-            if stat:
-                stats[stat] = val
-        return stats
 
     @property
     def projection_error(self) -> float:
