@@ -193,9 +193,8 @@ class League:
         :rtype: List[float]
         """
         scores = []
-        cm = self.current_matchup_num()
         for m in self._matchups:
-            if m.matchup_num >= cm or m.is_bye:
+            if m.winner == "UNDECIDED" or m.is_bye:
                 continue
             if (not include_playoffs) and m.is_playoff:
                 continue
