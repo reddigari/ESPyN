@@ -30,11 +30,11 @@ class PlayerTest(TestCase):
     def test_stat_line(self):
         pweek = PlayerWeek(self.entry_data)
         stats = pweek.stat_line
-        self.assertEqual(stats["rush_att"], 21)
-        self.assertEqual(stats["rush_yds"], 112)
-        self.assertEqual(stats["rush_td"], 2)
-        self.assertEqual(stats["rec"], 4)
-        self.assertEqual(stats["rec_yds"], 24)
+        self.assertEqual(stats["Rushing Attempts"], 21)
+        self.assertEqual(stats["Rushing Yards"], 112)
+        self.assertEqual(stats["TD Rush"], 2)
+        self.assertEqual(stats["Receptions"], 4)
+        self.assertEqual(stats["Receiving Yards"], 24)
 
     def test_manual_score_calc(self):
         pweek = PlayerWeek(self.entry_data)
