@@ -19,7 +19,6 @@ class TeamWeek:
             self.points = week_data["pointsByScoringPeriod"][str(scoring_period)]
         except KeyError:
             # scoring period breakdown may be missing if 0 points for matchup
-            assert week_data["totalPoints"] == 0
             self.points = 0
         self.slots = []
         for slot in week_data["rosterForCurrentScoringPeriod"]["entries"]:
