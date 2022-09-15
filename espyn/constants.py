@@ -7,10 +7,15 @@ SLOTS = {
     2: "RB",
     3: "RB/WR",
     4: "WR",
+    5: "WR/TE",
     6: "TE",
     7: "OP",  # offensive utility player
+    8: "DT",
+    9: "DE",
     10: "LB",
     11: "DL",
+    12: "CB",
+    13: "S",
     14: "DB",
     15: "DP", # defensive utility player
     16: "D/ST",
