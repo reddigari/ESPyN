@@ -16,17 +16,23 @@ class PlayerWeek:
         self.player = Player(ppe["player"])
         self.slot_id = stat_data["lineupSlotId"]
         self.slot = SLOTS[self.slot_id]
+        self.points, self.projected_points = None, None
         stats_arr = ppe["player"]["stats"]
         if not stats_arr:
             return
-        real = stats_arr[0]
-        proj = stats_arr[1] if len(stats_arr) == 2 else dict()
+        # real and projected stats objects are not in predictable order,
+        # and neither is guaranteed to be there
+        real = [i for i in stats_arr if i["statSourceId"] == 0]
+        real = real[0] if real else dict()
+        proj = [i for i in stats_arr if i["statSourceId"] == 1]
+        proj = proj[0] if proj else dict()
         self.points = ppe["appliedStatTotal"]
-        self.projected_points = proj.get("appliedTotal") or 0.
+        self.projected_points = proj.get("appliedTotal", 0.0)
         self._coded_stats, self._coded_proj = dict(), dict()
-        self._coded_stats = {
-            int(k): v for k, v in real["stats"].items()
-        }
+        if real.get("stats"):
+            self._coded_stats = {
+                int(k): v for k, v in real["stats"].items()
+            }
         if proj.get("stats"):
             self._coded_proj = {
                 int(k): v for k, v in proj["stats"].items()
