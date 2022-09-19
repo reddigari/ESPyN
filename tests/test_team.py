@@ -18,7 +18,6 @@ class TeamTests(TestCase):
         league.draft_order.index.return_value = 99
         league.name_from_user_id.return_value = "Mockboi"
         league.total_matchups = 14
-        league.current_matchup_num.return_value = 5
         league.configure_mock(**kwargs)
         return league
 
@@ -61,12 +60,12 @@ class TeamTests(TestCase):
         matchup.configure_mock(home_team_id=1, home_scores=[10],
                                is_bye=False)
         scores = team.scores()
-        self.assertEqual(len(scores), 4)
-        self.assertEqual(sum(scores), 40)
+        self.assertEqual(len(scores), 14)
+        self.assertEqual(sum(scores), 140)
         # always away team
         matchup.configure_mock(away_team_id=1, away_scores=[20],
                                home_team_id=None)
-        self.assertEqual(sum(team.scores()), 80)
+        self.assertEqual(sum(team.scores()), 280)
         # season over (expect `league.total_matchups` scores)
         league.current_matchup_num.return_value = SEASON_OVER
         self.assertEqual(len(team.scores()), league.total_matchups)
