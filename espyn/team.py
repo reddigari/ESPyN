@@ -99,12 +99,10 @@ class Team:
         :rtype: List[float]
         """
         scores = []
-        cm = self._league.current_matchup_num()
-        if cm == SEASON_OVER:
-            cm = self._league.total_matchups + 1
-        for m_num in range(1, cm):  # excludes matchup in progress
+        total_m = self._league.total_matchups + 1
+        for m_num in range(1, total_m):
             m = self.get_matchup(m_num)
-            if m is None or m.is_bye:
+            if m is None or m.is_bye or m.winner == "UNDECIDED":
                 continue
             if (not include_playoffs) and m.is_playoff:
                 continue
